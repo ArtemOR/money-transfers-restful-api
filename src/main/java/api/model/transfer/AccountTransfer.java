@@ -4,24 +4,14 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 public class AccountTransfer {
-    long id;
-    Long accountToId;
-    BigDecimal amount;
-    Long time;
+    private Long accountToId;
+    private BigDecimal amount;
+    private Long time;
 
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public AccountTransfer(Long accountToId, BigDecimal amount, Long time, long id) {
+    public AccountTransfer(Long accountToId, BigDecimal amount, Long time ) {
         this.accountToId = accountToId;
         this.amount = amount;
         this.time = time;
-        this.id = id;
     }
 
     public AccountTransfer() {
@@ -54,8 +44,7 @@ public class AccountTransfer {
     @Override
     public String toString() {
         return "AccountTransfer{" +
-                "id=" + id +
-                ", accountToId=" + accountToId +
+                "accountToId=" + accountToId +
                 ", amount=" + amount +
                 ", time=" + time +
                 '}';
@@ -66,14 +55,13 @@ public class AccountTransfer {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AccountTransfer that = (AccountTransfer) o;
-        return id == that.id &&
-                Objects.equals(accountToId, that.accountToId) &&
+        return Objects.equals(accountToId, that.accountToId) &&
                 Objects.equals(amount, that.amount) &&
                 Objects.equals(time, that.time);
     }
     @Override
     public int hashCode() {
-        return Objects.hash(id, accountToId, amount, time);
+        return Objects.hash(accountToId, amount, time);
     }
 
 }

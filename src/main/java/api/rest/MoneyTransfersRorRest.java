@@ -47,11 +47,6 @@ public class MoneyTransfersRorRest {
 
         port(8082);
 
-        get("/users", ACCEPT_TYPE, (request, response) -> {
-            response.type(CONTENT_TYPE);
-            return gson.toJson(users.values());
-        });
-
         post("/user", ACCEPT_TYPE, (request, response) -> {
             response.type(CONTENT_TYPE);
             String json_user = request.body();
@@ -79,15 +74,9 @@ public class MoneyTransfersRorRest {
             return response.body();
         });
 
-        delete("/user/:passportId", (request, response) -> {
+        get("/users", ACCEPT_TYPE, (request, response) -> {
             response.type(CONTENT_TYPE);
-            String passportId = request.params(PASSPORT_ID_PARAM);
-            if (!users.containsKey(passportId)) {
-                return generateUserNotFoundException(response, passportId);
-            }
-            users.remove(passportId);
-            response.status(204);
-            return response;
+            return gson.toJson(users.values());
         });
 
         get("/user/:passportId", ACCEPT_TYPE, (request, response) -> {
@@ -99,17 +88,15 @@ public class MoneyTransfersRorRest {
             return gson.toJson(users.get(passportId));
         });
 
-        get("/transfers", ACCEPT_TYPE, (request, response) -> {
+        delete("/user/:passportId", (request, response) -> {
             response.type(CONTENT_TYPE);
-            String accountToId = request.queryParams(ACCOUNT_TO_ID_PARAM);
-            if(accountToId == null) {
-                return gson.toJson(accountTransfers.values());
+            String passportId = request.params(PASSPORT_ID_PARAM);
+            if (!users.containsKey(passportId)) {
+                return generateUserNotFoundException(response, passportId);
             }
-            List<AccountTransfer> transfers = accountTransfers.values().stream().filter(at -> at.getAccountToId().equals(Long.valueOf(accountToId))).collect(Collectors.toList());
-            if (transfers.isEmpty()) {
-                return generateTransfersNotFoundException(response, accountToId);
-            }
-            return gson.toJson(transfers);
+            users.remove(passportId);
+            response.status(204);
+            return response;
         });
 
         post("/account", ACCEPT_TYPE, (request, response) -> {
@@ -131,6 +118,21 @@ public class MoneyTransfersRorRest {
             response.body(gson.toJson(accounts.get(accountId)));
 
             return response.body();
+        });
+
+        get("/accounts", ACCEPT_TYPE, (request, response) -> {
+            response.type(CONTENT_TYPE);
+            return gson.toJson(accounts.values());
+
+        });
+
+        get("/account/:accountId", ACCEPT_TYPE, (request, response) -> {
+            response.type(CONTENT_TYPE);
+            Long accountId = Long.valueOf(request.params(ACCOUNT_ID_PARAM));
+            if (!accounts.containsKey(accountId)) {
+                return generateAccountNotFoundException(response, accountId.toString());
+            }
+            return gson.toJson(accounts.get(accountId));
         });
 
         delete("/account/:accountId", (request, response) -> {
@@ -167,13 +169,13 @@ public class MoneyTransfersRorRest {
             response.status(200);
             response.body(gson.toJson(accounts.get(accountId)));
             balanceRecharge.setTime(System.currentTimeMillis());
-            long transferId = getIdGenerator().generateTransferId();
+            long transferId = getIdGenerator().generateChargingId();
             balanceRecharge.setId(transferId);
             accountTransfers.put(transferId, balanceRecharge);
-            return response.body();
+            return gson.toJson(accountTransfers.get(transferId));
         });
 
-        put("/account/transfer", ACCEPT_TYPE, (request, response) -> {
+        put("/accounts/transfer", ACCEPT_TYPE, (request, response) -> {
             response.type(CONTENT_TYPE);
             String json_account = request.body();
 
@@ -220,19 +222,27 @@ public class MoneyTransfersRorRest {
             return response.body();
         });
 
-        get("/accounts", ACCEPT_TYPE, (request, response) -> {
+        get("/accounts/transfers", ACCEPT_TYPE, (request, response) -> {
             response.type(CONTENT_TYPE);
-            return gson.toJson(accounts.values());
+            List<AccountTransfer> transfers;
+            String accountId;
 
-        });
-
-        get("/account/:accountId", ACCEPT_TYPE, (request, response) -> {
-            response.type(CONTENT_TYPE);
-            Long accountId = Long.valueOf(request.params(ACCOUNT_ID_PARAM));
-            if (!accounts.containsKey(accountId)) {
-                return generateAccountNotFoundException(response, accountId.toString());
+            if (request.queryParams(ACCOUNT_TO_ID_PARAM) != null) {
+                accountId = request.queryParams(ACCOUNT_TO_ID_PARAM);
+                transfers = accountTransfers.values().stream().filter(at -> at.getAccountToId().equals(Long.valueOf(accountId))).collect(Collectors.toList());
+            } else if (request.queryParams(ACCOUNT_FROM_ID_PARAM) != null) {
+                accountId = request.queryParams(ACCOUNT_FROM_ID_PARAM);
+                transfers = accountTransfers.values().stream().filter(at -> at.getClass().equals(BetweenAccountsTransfer.class))
+                        .filter(at -> ((BetweenAccountsTransfer) at).getAccountFromId().equals(Long.valueOf(accountId)))
+                        .collect(Collectors.toList());
+            } else {
+                return gson.toJson(accountTransfers.values());
             }
-            return gson.toJson(accounts.get(accountId));
+
+            if (transfers.isEmpty()) {
+                return generateTransfersNotFoundException(response, accountId);
+            }
+            return gson.toJson(transfers);
         });
 
     }

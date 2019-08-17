@@ -41,8 +41,8 @@ public class MoneyTransferExceptionGenerator {
         return setBody(STATUS_BAD_REQUEST, response, exception);
     }
 
-    public static String generateTransfersNotFoundException(Response response, String accountToId) {
-        MoneyTransfersException exception = new MoneyTransfersException(ExceptionConstants.TRANSFER_NOT_FOUND_ID, ExceptionConstants.TRANSFER_NOT_FOUND_MESSAGE + accountToId);
+    public static String generateTransfersNotFoundException(Response response, String accountId) {
+        MoneyTransfersException exception = new MoneyTransfersException(ExceptionConstants.TRANSFER_NOT_FOUND_ID, ExceptionConstants.TRANSFER_NOT_FOUND_MESSAGE + accountId);
         return setBody(STATUS_NOT_FOUND, response, exception);
     }
 

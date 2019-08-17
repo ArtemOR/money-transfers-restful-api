@@ -4,11 +4,13 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 public class BetweenAccountsTransfer extends AccountTransfer {
+    private long id;
     private Long accountFromId;
 
-    public BetweenAccountsTransfer(Long accountToId, BigDecimal amount, Long time, Long accountFromId, Long transferId) {
-        super(accountToId, amount, time, transferId);
+    public BetweenAccountsTransfer(Long transferId, Long accountFromId, Long accountToId, BigDecimal amount, Long time) {
+        super(accountToId, amount, time);
         this.accountFromId = accountFromId;
+        this.id = transferId;
     }
 
     public Long getAccountFromId() {
@@ -19,28 +21,34 @@ public class BetweenAccountsTransfer extends AccountTransfer {
         this.accountFromId = accountFromId;
     }
 
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         BetweenAccountsTransfer that = (BetweenAccountsTransfer) o;
-        return Objects.equals(accountFromId, that.accountFromId);
+        return id == that.id &&
+                Objects.equals(accountFromId, that.accountFromId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), accountFromId);
+        return Objects.hash(super.hashCode(), id, accountFromId);
     }
 
     @Override
     public String toString() {
         return "BetweenAccountsTransfer{" +
-                "accountFromId=" + accountFromId +
                 "id=" + id +
-                ", accountToId=" + accountToId +
-                ", amount=" + amount +
-                ", time=" + time +
+                ", accountFromId=" + accountFromId +
                 '}';
     }
 }
