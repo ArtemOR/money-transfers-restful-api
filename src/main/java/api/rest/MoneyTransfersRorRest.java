@@ -90,6 +90,15 @@ public class MoneyTransfersRorRest {
             return response;
         });
 
+        get("/user/:passportId", ACCEPT_TYPE, (request, response) -> {
+            response.type(CONTENT_TYPE);
+            String passportId = request.params(PASSPORT_ID_PARAM);
+            if (!users.containsKey(passportId)) {
+                return generateUserNotFoundException(response, passportId);
+            }
+            return gson.toJson(users.get(passportId));
+        });
+
         get("/transfers", ACCEPT_TYPE, (request, response) -> {
             response.type(CONTENT_TYPE);
             String accountToId = request.queryParams(ACCOUNT_TO_ID_PARAM);
@@ -101,15 +110,6 @@ public class MoneyTransfersRorRest {
                 return generateTransfersNotFoundException(response, accountToId);
             }
             return gson.toJson(transfers);
-        });
-
-        get("/user/:passportId", ACCEPT_TYPE, (request, response) -> {
-            response.type(CONTENT_TYPE);
-            String passportId = request.params(PASSPORT_ID_PARAM);
-            if (!users.containsKey(passportId)) {
-                return generateUserNotFoundException(response, passportId);
-            }
-            return gson.toJson(users.get(passportId));
         });
 
         post("/account", ACCEPT_TYPE, (request, response) -> {
@@ -144,7 +144,7 @@ public class MoneyTransfersRorRest {
             return response;
         });
 
-        post("/account/recharge", ACCEPT_TYPE, (request, response) -> {
+        put("/account/recharge", ACCEPT_TYPE, (request, response) -> {
             response.type(CONTENT_TYPE);
             String json_account = request.body();
 
@@ -173,7 +173,7 @@ public class MoneyTransfersRorRest {
             return response.body();
         });
 
-        post("/account/transfer", ACCEPT_TYPE, (request, response) -> {
+        put("/account/transfer", ACCEPT_TYPE, (request, response) -> {
             response.type(CONTENT_TYPE);
             String json_account = request.body();
 
