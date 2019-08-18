@@ -1,8 +1,5 @@
 package api.exception;
 
-import com.google.gson.Gson;
-import spark.Response;
-
 public class MoneyTransfersException {
 
     private String errorCode;
