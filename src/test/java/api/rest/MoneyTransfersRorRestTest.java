@@ -15,8 +15,8 @@ public class MoneyTransfersRorRestTest {
         RestAssured.port = 8082;
     }
 
-    @Test public void testCreateUser() {
-        get("/user/123")
+    @Test public void stestCreateUser() {
+        get("/users/123")
                 .then()
                 .assertThat()
                 .statusCode(404);
@@ -26,29 +26,29 @@ public class MoneyTransfersRorRestTest {
                 "    \"passportId\": \"123\"\n" +
                 "}").
                 when().
-                post("/user").
+                post("/users").
                 then().
                 assertThat().
                 statusCode(200);
 
-        get("/user/123")
+        get("/users/123")
                 .then()
                 .assertThat()
                 .statusCode(200);
     }
 
     @Test public void testDeleteUser() {
-        get("/user/123")
+        get("/users/123")
                 .then()
                 .assertThat()
                 .statusCode(200);
 
-        delete("/user/123")
+        delete("/users/123")
                 .then()
                 .assertThat()
                 .statusCode(204);
 
-        get("/user/123")
+        get("/users/123")
                 .then()
                 .assertThat()
                 .statusCode(404);

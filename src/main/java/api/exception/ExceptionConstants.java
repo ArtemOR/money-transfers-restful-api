@@ -17,5 +17,6 @@ public class ExceptionConstants {
     public static final String MONEY_AMOUNT_SHOULD_BE_POSITIVE_MESSAGE = "Money amount should be positive value: amount=";
     public static final String NOT_ENOUGH_MONEY_MESSAGE = "Not enough money to complete the operation";
     public static final String TRANSFER_NOT_FOUND_MESSAGE = "Transfers not found for account: accountId=";
+    public static final String TRANSFERS_NOT_FOUND_MESSAGE = "Transfers not found";
 
 }

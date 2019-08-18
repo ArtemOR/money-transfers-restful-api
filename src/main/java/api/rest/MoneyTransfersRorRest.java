@@ -26,7 +26,7 @@ public class MoneyTransfersRorRest {
 
         get("/accounts/:accountId", ACCEPT_TYPE, RestService::getAccountByAccountId);
 
-        get("/accounts/transfers", ACCEPT_TYPE, RestService::getTransfersHistory);
+        get("/account/transfers", ACCEPT_TYPE, RestService::getTransfersHistory);
 
         put("/accounts/recharge", ACCEPT_TYPE, RestService::addMoneyToAccount);
 

@@ -46,6 +46,11 @@ public class MoneyTransferExceptionGenerator {
         return setBody(STATUS_NOT_FOUND, response, exception);
     }
 
+    public static String generateTransfersNotFoundException(Response response) {
+        MoneyTransfersException exception = new MoneyTransfersException(ExceptionConstants.TRANSFER_NOT_FOUND_ID, ExceptionConstants.TRANSFERS_NOT_FOUND_MESSAGE);
+        return setBody(STATUS_NOT_FOUND, response, exception);
+    }
+
     private static String setBody(int status, Response response, MoneyTransfersException exception) {
         response.status(status);
         response.body(gson.toJson(exception));

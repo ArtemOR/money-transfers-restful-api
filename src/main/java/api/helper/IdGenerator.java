@@ -27,6 +27,7 @@ public class IdGenerator {
     public long generateTransferId() {
         return START_TRANSFER_ID_NUMBER + System.currentTimeMillis();
     }
+
     public long generateChargingId() {
         return START_CHARGING_ID_NUMBER + System.currentTimeMillis();
     }
