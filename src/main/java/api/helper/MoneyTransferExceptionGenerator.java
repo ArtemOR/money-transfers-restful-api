@@ -32,7 +32,7 @@ public class MoneyTransferExceptionGenerator {
     }
 
     public static String generateMoneyAmountShouldBePositiveException(Response response, String amount) {
-        MoneyTransfersException exception = new MoneyTransfersException(ExceptionConstants.MONEY_AMOUNT_SHOULD_BE_POSITIVE_ID, ExceptionConstants.MONEY_AMOUNT_SHOULD_BE_POSITIVE_MESSAGE + amount);
+        MoneyTransfersException exception = new MoneyTransfersException(ExceptionConstants.MONEY_PARAMETER_SHOULD_CONTAIN_POSITIVE_VALUE_ID, ExceptionConstants.MONEY_PARAMETER_SHOULD_CONTAIN_POSITIVE_VALUE_MESSAGE + amount);
         return setBody(STATUS_BAD_REQUEST, response, exception);
     }
 

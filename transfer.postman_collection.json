@@ -1,0 +1,339 @@
+{
+	"info": {
+		"_postman_id": "d15670ca-a240-4302-83bb-0c8dad6ee626",
+		"name": "transfer",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "localhost:8082/users",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\":\"testUser\",\n\t\"passportId\":\"11\"\n}"
+				},
+				"url": {
+					"raw": "localhost:8082/users",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8082/accounts",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "\n {\n\n        \"userPassportId\": \"11\",\n        \"moneyBalance\": 1000,\n        \"creditLimit\": 10000\n   \n}"
+				},
+				"url": {
+					"raw": "localhost:8082/accounts",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"accounts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8082/users/getAll",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:8082/users/getAll",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"users",
+						"getAll"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8082/users/{passportId}",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:8082/users/222",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"users",
+						"222"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8082/accounts/getAll",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:8082/accounts/getAll",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"accounts",
+						"getAll"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8082/accounts/{accountId}",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:8082/accounts/12",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"accounts",
+						"12"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8082/account/transfers",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"accountFromId\": 11,\r\n    \"accountToId\": 12,\r\n    \"amount\": 100.10\r\n   \r\n}"
+				},
+				"url": {
+					"raw": "localhost:8082/account/transfers",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"account",
+						"transfers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8082/account/transfers?accountToId={accountToId}",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:8082/account/transfers?accountToId=131",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"account",
+						"transfers"
+					],
+					"query": [
+						{
+							"key": "accountToId",
+							"value": "131"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8082/account/transfers?accountFromId={accountFromId}",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"accountFromId\": 11,\r\n    \"accountToId\": 12,\r\n    \"amount\": 100.10\r\n   \r\n}"
+				},
+				"url": {
+					"raw": "localhost:8082/account/transfers?accountFromId=111",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"account",
+						"transfers"
+					],
+					"query": [
+						{
+							"key": "accountFromId",
+							"value": "111"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8082/accounts/recharge",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"accountToId\": 12,\r\n    \"amount\": 100\r\n}"
+				},
+				"url": {
+					"raw": "localhost:8082/accounts/recharge",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"accounts",
+						"recharge"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8082/accounts/transfer",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"accountFromId\": 11,\r\n    \"accountToId\": 13,\r\n    \"amount\": 10000000\r\n}"
+				},
+				"url": {
+					"raw": "localhost:8082/accounts/transfer",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"accounts",
+						"transfer"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8082/user/{passportId}",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:8082/users/111",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"users",
+						"111"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8082/accounts/{id}",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:8082/accounts/13",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"accounts",
+						"13"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

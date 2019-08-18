@@ -22,8 +22,12 @@ public class RestService {
     private static Gson gson = new Gson();
 
     private static final String CONTENT_TYPE = "application/json";
+    private static final String REQUEST = "request";
     private static final String PASSPORT_ID_PARAM = "passportId";
     private static final String USER_PASSPORT_ID_PARAM = "userPassportId";
+    private static final String MONEY_BALANCE_PARAM = "moneyBalance";
+    private static final String AMOUNT_PARAM = "amount";
+    private static final String CREDIT_LIMIT_PARAM = "creditLimit";
     private static final String ACCOUNT_ID_PARAM = "accountId";
     private static final String ACCOUNT_TO_ID_PARAM = "accountToId";
     private static final String ACCOUNT_FROM_ID_PARAM = "accountFromId";
@@ -38,6 +42,7 @@ public class RestService {
     private static Map<Long, AccountTransfer> accountTransfers = new HashMap<>();
 
     public static String createUser(Request request, Response response) {
+        response.type(CONTENT_TYPE);
 
         //read the body of request
         String json_user = request.body();
@@ -45,7 +50,7 @@ public class RestService {
 
         //check if it is possible to create an object from json
         if (user == null) {
-            return generateMissingMandatoryParametersException(response, request.body());
+            return generateMissingMandatoryParametersException(response, REQUEST);
         }
 
         String passportId = user.getPassportId();
@@ -72,12 +77,13 @@ public class RestService {
         //generate the response
         response.status(200);
         response.body(gson.toJson(users.get(passportId)));
-        response.type(CONTENT_TYPE);
 
         return response.body();
     }
 
     public static String createAccount(Request request, Response response) {
+        response.type(CONTENT_TYPE);
+
         String json_account = request.body();
         Account account = gson.fromJson(json_account, Account.class);
 
@@ -93,14 +99,34 @@ public class RestService {
             return generateMissingMandatoryParametersException(response, USER_PASSPORT_ID_PARAM);
         }
 
+        //check that user exist
+        if (!users.containsKey(userPassportId)) {
+            return generateUserNotFoundException(response, USER_PASSPORT_ID_PARAM);
+        }
+
+        //check that creditLimit and money balance not negative
+        if (account.getCreditLimit()!=null) {
+            if(account.getCreditLimit().longValue()<0)
+            return generateMoneyAmountShouldBePositiveException(response, CREDIT_LIMIT_PARAM);
+        } else {
+            account.setCreditLimit(BigDecimal.ZERO);
+        }
+
+        if (account.getMoneyBalance()!=null) {
+            if(account.getMoneyBalance().longValue()<0)
+            return generateMoneyAmountShouldBePositiveException(response, MONEY_BALANCE_PARAM);
+        } else {
+            account.setMoneyBalance(BigDecimal.ZERO);
+        }
+
         //generate unique id for account
         long accountId = getIdGenerator().generateAccountId();
         account.setId(accountId);
+        account.setAccountType(account.getCreditLimit().longValue() > 0 ? AccountType.CREDIT : AccountType.DEBIT);
 
         accounts.put(account.getId(), account);
 
         //generate the response
-        response.type(CONTENT_TYPE);
         response.status(200);
         response.body(gson.toJson(accounts.get(accountId)));
 
@@ -113,22 +139,26 @@ public class RestService {
     }
 
     public static String getUserByPassportId(Request request, Response response) {
+        response.type(CONTENT_TYPE);
+
         String passportId = request.params(PASSPORT_ID_PARAM);
 
         //check if user exist
         if (!users.containsKey(passportId)) {
             return generateUserNotFoundException(response, passportId);
         }
-        response.type(CONTENT_TYPE);
         return gson.toJson(users.get(passportId));
     }
 
     public static String getAllAccounts(Request request, Response response) {
         response.type(CONTENT_TYPE);
+
         return gson.toJson(accounts.values());
     }
 
     public static String getAccountByAccountId(Request request, Response response) {
+        response.type(CONTENT_TYPE);
+
         Long accountId = Long.valueOf(request.params(ACCOUNT_ID_PARAM));
 
         //check if account exist
@@ -136,7 +166,6 @@ public class RestService {
             return generateAccountNotFoundException(response, accountId.toString());
         }
 
-        response.type(CONTENT_TYPE);
         return gson.toJson(accounts.get(accountId));
     }
 
@@ -173,11 +202,13 @@ public class RestService {
         if (transfers.isEmpty()) {
             return generateTransfersNotFoundException(response, accountId);
         }
+
         return gson.toJson(transfers);
     }
 
     public static String addMoneyToAccount(Request request, Response response) {
         response.type(CONTENT_TYPE);
+
         String json_account = request.body();
 
         InsideAccountTransfer balanceRecharge = gson.fromJson(json_account, InsideAccountTransfer.class);
@@ -198,6 +229,13 @@ public class RestService {
         if (!accounts.containsKey(accountId)) {
             return generateAccountNotFoundException(response, accountId.toString());
         }
+        //check that amount of money is positive
+        if (Objects.isNull(balanceRecharge.getAmount())) {
+            return generateMissingMandatoryParametersException(response, AMOUNT_PARAM);
+        }
+        if (balanceRecharge.getAmount().longValue() < 0) {
+            return generateMoneyAmountShouldBePositiveException(response, AMOUNT_PARAM);
+        }
 
         Account account = accounts.get(accountId);
         BigDecimal value = balanceRecharge.getAmount();
@@ -213,17 +251,19 @@ public class RestService {
 
         response.status(200);
         response.body(gson.toJson(accounts.get(accountId)));
+
         return gson.toJson(accountTransfers.get(transferId));
     }
 
     public static String transferMoneyBetweenAccounts(Request request, Response response) {
         response.type(CONTENT_TYPE);
+
         String json_account = request.body();
 
         BetweenAccountsTransfer betweenAccountsTransfer = gson.fromJson(json_account, BetweenAccountsTransfer.class);
         //check if it is possible to create an object from json
         if (betweenAccountsTransfer == null) {
-            return generateMissingMandatoryParametersException(response, "request");
+            return generateMissingMandatoryParametersException(response, REQUEST);
         }
 
         //check for mandatory parameters an that all accounts exist
@@ -248,7 +288,7 @@ public class RestService {
 
         //check that value is positive
         if (value.longValue() < 0) {
-            return generateMoneyAmountShouldBePositiveException(response, value.toString());
+            return generateMoneyAmountShouldBePositiveException(response, AMOUNT_PARAM);
         }
 
         //check that there is enough money
@@ -268,12 +308,14 @@ public class RestService {
 
         response.status(200);
         response.body(gson.toJson(Arrays.asList(accountFrom, accountTo)));
+
         return response.body();
     }
 
     //TODO: it is better not to remove users and its binded accounts, but make it NOT ACTIVE. For further improvement
     public static String deleteUserByPassportId(Request request, Response response) {
         response.type(CONTENT_TYPE);
+
         String passportId = request.params(PASSPORT_ID_PARAM);
 
         //check if collection of users contains such key
@@ -295,6 +337,7 @@ public class RestService {
     //TODO: it is better not to remove account, but make it NOT ACTIVE. For further improvement
     public static String deleteAccountByAccountId(Request request, Response response) {
         response.type(CONTENT_TYPE);
+
         Long accountId = Long.valueOf(request.params(ACCOUNT_ID_PARAM));
 
         //check if the necessary object exist
@@ -304,6 +347,7 @@ public class RestService {
 
         accounts.remove(accountId);
         response.status(204);
+
         return gson.toJson(accounts.get(accountId));
     }
 
