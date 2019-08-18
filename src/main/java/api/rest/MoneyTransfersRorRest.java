@@ -1,6 +1,7 @@
 package api.rest;
 
 import api.service.RestService;
+import spark.Spark;
 
 import static spark.Spark.*;
 
@@ -8,9 +9,21 @@ public class MoneyTransfersRorRest {
 
     private static final String ACCEPT_TYPE = "application/json";
 
+    static void start() {
+        MoneyTransfersRorRest.main(null);
+        Spark.awaitInitialization();
+    }
+
+    static void stop() {
+        Spark.stop();
+        Spark.awaitStop();
+    }
+
     public static void main(String[] args) {
 
         RestService.createSomeTestObjects();
+
+        threadPool(100);
 
         port(8082);
 

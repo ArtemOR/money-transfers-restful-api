@@ -89,7 +89,7 @@ public class RestService {
 
         //check if it is possible to create an object from json
         if (account == null) {
-            return generateMissingMandatoryParametersException(response, "request");
+            return generateMissingMandatoryParametersException(response, REQUEST);
         }
 
         String userPassportId = account.getUserPassportId();
@@ -101,7 +101,7 @@ public class RestService {
 
         //check that user exist
         if (!users.containsKey(userPassportId)) {
-            return generateUserNotFoundException(response, USER_PASSPORT_ID_PARAM);
+            return generateUserNotFoundException(response, userPassportId);
         }
 
         //check that creditLimit and money balance not negative
