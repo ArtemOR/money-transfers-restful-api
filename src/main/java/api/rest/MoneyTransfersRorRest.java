@@ -52,6 +52,8 @@ public class MoneyTransfersRorRest {
 
         exception(MoneyTransfersException.class, RestService::generateException);
 
+        exception(NumberFormatException.class, RestService::generateException);
+
         internalServerError(RestService::handleInternalServerError);
 
     }

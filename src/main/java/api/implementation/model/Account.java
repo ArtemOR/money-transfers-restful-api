@@ -54,6 +54,9 @@ public class Account {
     private BigDecimal creditLimit;
 
 
+    public Account() {
+    }
+
     public Account(long id, String passportId, BigDecimal moneyBalance, AccountType accountType,
                    BigDecimal creditLimit) {
         this.id = id;
