@@ -66,7 +66,7 @@ public class MoneyTransfersRorRestTest {
                 post("/users").
                 then().
                 assertThat().
-                statusCode(HttpStatus.BAD_REQUEST_400).extract().jsonPath().getString("message");
+                statusCode(HttpStatus.BAD_REQUEST_400).extract().jsonPath().getString("detailMessage");
         assertTrue(createResult.contains(USER_ALREADY_EXIST_MESSAGE_EXCEPTION));
 
 
@@ -86,7 +86,7 @@ public class MoneyTransfersRorRestTest {
         String deleteResult = delete("/users/" + PASSPORT_ID)
                 .then()
                 .assertThat()
-                .statusCode(HttpStatus.NOT_FOUND_404).extract().jsonPath().getString("message");
+                .statusCode(HttpStatus.NOT_FOUND_404).extract().jsonPath().getString("detailMessage");
         assertTrue(deleteResult.contains(USER_DOES_NOT_EXIST_MESSAGE_EXCEPTION));
     }
 
@@ -112,7 +112,7 @@ public class MoneyTransfersRorRestTest {
                 .statusCode(HttpStatus.OK_200);
 
         long accountId = given().body("{\n" +
-                "\"userPassportId\": " + USER_PASSPORT_ID + ",\n" +
+                "\"passportId\": " + USER_PASSPORT_ID + ",\n" +
                 "\"moneyBalance\": " + INITIAL_MONEY_AMOUNT + " \n" +
                 "}").
                 when().post("/accounts").then().
@@ -191,7 +191,7 @@ public class MoneyTransfersRorRestTest {
 
         //create accounts for users
         long accountFirstId = given().body("{\n" +
-                "\"userPassportId\": " + FIRST_USER_PASSPORT_ID + ",\n" +
+                "\"passportId\": " + FIRST_USER_PASSPORT_ID + ",\n" +
                 "\"moneyBalance\": " + FIRST_ACCOUNT_INITIAL_MONEY_AMOUNT + ",\n" +
                 "\"creditLimit\": " + FIRST_ACCOUNT_INITIAL_CREDIT_AMOUNT + " \n" +
                 "}").
@@ -200,7 +200,7 @@ public class MoneyTransfersRorRestTest {
                 extract().jsonPath().getLong("id");
 
         long accountSecondId = given().body("{\n" +
-                "\"userPassportId\": " + SECOND_USER_PASSPORT_ID + ",\n" +
+                "\"passportId\": " + SECOND_USER_PASSPORT_ID + ",\n" +
                 "\"moneyBalance\": " + SECOND_ACCOUNT_INITIAL_MONEY_AMOUNT + "\n" +
                 "}").
                 when().post("/accounts").then().
@@ -214,7 +214,7 @@ public class MoneyTransfersRorRestTest {
                 "\"amount\": " + A_HUGE_AMOUNT_OF_MONEY + "\n" +
                 "}").
                 when().put("/accounts/transfer").then().
-                assertThat().statusCode(HttpStatus.BAD_REQUEST_400).body("message", equalTo(NOT_ENOUGH_MONEY_MESSAGE_EXCEPTION));
+                assertThat().statusCode(HttpStatus.BAD_REQUEST_400).body("detailMessage", equalTo(NOT_ENOUGH_MONEY_MESSAGE_EXCEPTION));
 
         //positive: try to use credit money
         Object actual = given().body("{\n" +

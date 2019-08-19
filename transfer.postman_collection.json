@@ -34,7 +34,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "\n {\n\n        \"userPassportId\": \"11\",\n        \"moneyBalance\": 1000,\n        \"creditLimit\": 10000\n   \n}"
+					"raw": "\n {\n\n        \"passportId\": \"11\",\n        \"moneyBalance\": 1000,\n        \"creditLimit\": 10000\n   \n}"
 				},
 				"url": {
 					"raw": "localhost:8082/accounts",

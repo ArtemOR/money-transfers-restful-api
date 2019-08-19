@@ -63,7 +63,7 @@ Sample Call:
 	POST http://<host>/accounts
 	Body:
 		{
-			"userPassportId": "111",
+			"passportId": "111",
 			"moneyBalance": 1000,
 			"creditLimit": 0
 		}
@@ -71,7 +71,7 @@ Success Response:
 	HTTP Code: 200
 	Body: {
 			"id": 11566142796482,
-			"userPassportId": "111",
+			"passportId": "111",
 			"moneyBalance": 1000,
 			"accountType": "DEBIT",
 			"creditLimit": 0
@@ -86,7 +86,7 @@ Error Responses:
 	HTTP Code: 404
 	Body: {
 			"errorCode": "id3",
-			"message": "User with provider passportId does not exist: passportId=userPassportId"
+			"message": "User with provider passportId does not exist: passportId=passportId"
 		  }
 
 		  HTTP Code: 400
@@ -140,7 +140,7 @@ Success Response:
 	Body: [
 			{
 			  "id": 11,
-			  "userPassportId": "111",
+			  "passportId": "111",
 			  "moneyBalance": 1000,
 			  "accountType": "DEBIT",
 			  "creditLimit": 0
@@ -156,7 +156,7 @@ Success Response:
 	HTTP Code: 200
 	Body: {
 			"id": 12,
-			"userPassportId": "111",
+			"passportId": "111",
 			"moneyBalance": 0,
 			"accountType": "CREDIT",
 			"creditLimit": 1000
@@ -288,14 +288,14 @@ Success Response:
 	Body: [
 			{
 				"id": 11,
-				"userPassportId": "111",
+				"passportId": "111",
 				"moneyBalance": 900,
 				"accountType": "DEBIT",
 				"creditLimit": 0
 			},
 			{
 				"id": 13,
-				"userPassportId": "222",
+				"passportId": "222",
 				"moneyBalance": 3100,
 				"accountType": "DEBIT",
 				"creditLimit": 0

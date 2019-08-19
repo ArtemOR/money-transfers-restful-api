@@ -1,4 +1,4 @@
-package api.model;
+package api.implementation.model;
 
 import java.util.Objects;
 

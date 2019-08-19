@@ -1,6 +1,7 @@
 package api.rest;
 
-import api.service.RestService;
+import api.implementation.exception.MoneyTransfersException;
+import api.implementation.service.RestService;
 import spark.Spark;
 
 import static spark.Spark.*;
@@ -49,6 +50,10 @@ public class MoneyTransfersRorRest {
 
         delete("/accounts/:accountId",  ACCEPT_TYPE, RestService::deleteAccountByAccountId);
 
+        exception(MoneyTransfersException.class, RestService::generateException);
+
+        internalServerError(RestService::handleInternalServerError);
+
     }
-    
+
 }

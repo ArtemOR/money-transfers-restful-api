@@ -1,4 +1,4 @@
-package api.model.transfer;
+package api.implementation.model.transfer;
 
 import java.util.Objects;
 

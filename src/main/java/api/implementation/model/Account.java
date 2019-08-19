@@ -1,4 +1,4 @@
-package api.model;
+package api.implementation.model;
 
 import java.math.BigDecimal;
 import java.util.Objects;
@@ -7,7 +7,7 @@ import java.util.Objects;
 public class Account {
 
     private long id;
-    private String userPassportId;
+    private String passportId;
     private BigDecimal moneyBalance;
 
     public long getId() {
@@ -18,12 +18,12 @@ public class Account {
         this.id = id;
     }
 
-    public String getUserPassportId() {
-        return userPassportId;
+    public String getPassportId() {
+        return passportId;
     }
 
-    public void setUserPassportId(String userPassportId) {
-        this.userPassportId = userPassportId;
+    public void setPassportId(String passportId) {
+        this.passportId = passportId;
     }
 
     public BigDecimal getMoneyBalance() {
@@ -54,10 +54,10 @@ public class Account {
     private BigDecimal creditLimit;
 
 
-    public Account(long id, String userPassportId, BigDecimal moneyBalance, AccountType accountType,
+    public Account(long id, String passportId, BigDecimal moneyBalance, AccountType accountType,
                    BigDecimal creditLimit) {
         this.id = id;
-        this.userPassportId = userPassportId;
+        this.passportId = passportId;
         this.moneyBalance = moneyBalance;
         this.accountType = accountType;
         this.creditLimit = AccountType.CREDIT.equals(accountType) ? creditLimit : BigDecimal.ZERO;
@@ -69,7 +69,7 @@ public class Account {
         if (o == null || getClass() != o.getClass()) return false;
         Account account = (Account) o;
         return id == account.id &&
-                Objects.equals(userPassportId, account.userPassportId) &&
+                Objects.equals(passportId, account.passportId) &&
                 Objects.equals(moneyBalance, account.moneyBalance) &&
                 accountType == account.accountType &&
                 Objects.equals(creditLimit, account.creditLimit);
@@ -77,14 +77,14 @@ public class Account {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, userPassportId, moneyBalance, accountType, creditLimit);
+        return Objects.hash(id, passportId, moneyBalance, accountType, creditLimit);
     }
 
     @Override
     public String toString() {
         return "Account{" +
                 "id=" + id +
-                ", userPassportId='" + userPassportId + '\'' +
+                ", passportId='" + passportId + '\'' +
                 ", moneyBalance=" + moneyBalance +
                 ", accountType=" + accountType +
                 ", creditLimit=" + creditLimit +

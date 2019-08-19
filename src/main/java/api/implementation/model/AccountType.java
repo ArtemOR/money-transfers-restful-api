@@ -1,4 +1,4 @@
-package api.model;
+package api.implementation.model;
 
 public enum AccountType {
     DEBIT,

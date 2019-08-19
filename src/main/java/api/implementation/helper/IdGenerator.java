@@ -1,4 +1,4 @@
-package api.helper;
+package api.implementation.helper;
 
 public class IdGenerator {
 
