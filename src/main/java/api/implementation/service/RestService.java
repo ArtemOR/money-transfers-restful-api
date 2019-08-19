@@ -6,6 +6,8 @@ import api.implementation.helper.IdGenerator;
 import api.implementation.model.Account;
 import api.implementation.model.AccountType;
 import api.implementation.model.User;
+import api.implementation.model.request.AccountRequest;
+import api.implementation.model.request.UserRequest;
 import api.implementation.model.transfer.AccountTransfer;
 import api.implementation.model.transfer.BetweenAccountsTransfer;
 import api.implementation.model.transfer.InsideAccountTransfer;
@@ -17,6 +19,10 @@ import spark.Response;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static api.implementation.service.ServiceHelper.assertNotNull;
+import static api.implementation.service.ServiceHelper.convertResponseAccount;
+import static api.implementation.service.ServiceHelper.convertResponseUser;
 
 public class RestService {
 
@@ -47,37 +53,15 @@ public class RestService {
 
         //read the body of request
         String json_user = request.body();
-        User user = gson.fromJson(json_user, User.class);
-
-        //check if it is possible to create an object from json
-        if (user == null) {
-            throw new MoneyTransfersException(ExceptionList.MISSING_MANDATORY_PARAMETERS, REQUEST);
-        }
-
-        String passportId = user.getPassportId();
-
-        //check for mandatory params
-        if (passportId == null) {
-            throw new MoneyTransfersException(ExceptionList.MISSING_MANDATORY_PARAMETERS, PASSPORT_ID_PARAM);
-        }
-        if (user.getName() == null) {
-            throw new MoneyTransfersException(ExceptionList.MISSING_MANDATORY_PARAMETERS, NAME_PARAM);
-        }
-
-        //check is this object already exist
-        if (users.containsKey(passportId)) {
-            throw new MoneyTransfersException(ExceptionList.USER_ALREADY_EXIST, passportId);
-        }
-
-        //generate unique id for user
-        long userId = getIdGenerator().generateUserId();
-        user.setId(userId);
-
+        UserRequest userRequest = gson.fromJson(json_user, UserRequest.class);
+        assertNotNull(userRequest);
+        validateUser(userRequest);
+        User user = convertResponseUser(userRequest);
         users.put(user.getPassportId(), user);
 
         //generate the response
         response.status(HttpStatus.OK_200);
-        response.body(gson.toJson(users.get(passportId)));
+        response.body(gson.toJson(users.get(user.getPassportId())));
 
         return response.body();
     }
@@ -86,50 +70,17 @@ public class RestService {
         response.type(CONTENT_TYPE);
 
         String json_account = request.body();
-        Account account = gson.fromJson(json_account, Account.class);
+        AccountRequest accountRequest = gson.fromJson(json_account, AccountRequest.class);
 
         //check if it is possible to create an object from json
-        if (account == null) {
-            throw new MoneyTransfersException(ExceptionList.MISSING_MANDATORY_PARAMETERS, REQUEST);
-        }
-
-        String passportId = account.getPassportId();
-
-        //check for mandatory params
-        if (passportId == null) {
-            throw new MoneyTransfersException(ExceptionList.MISSING_MANDATORY_PARAMETERS, PASSPORT_ID_PARAM);
-        }
-
-        //check that user exist
-        if (!users.containsKey(passportId)) {
-            throw new MoneyTransfersException(ExceptionList.USER_NOT_FOUND, passportId);
-        }
-
-        //check that creditLimit and money balance not negative
-        if (account.getCreditLimit() != null) {
-            if (account.getCreditLimit().longValue() < 0)
-                throw new MoneyTransfersException(ExceptionList.MONEY_PARAMETER_SHOULD_CONTAIN_POSITIVE_VALUE, CREDIT_LIMIT_PARAM);
-        } else {
-            account.setCreditLimit(BigDecimal.ZERO);
-        }
-
-        if (account.getMoneyBalance() != null) {
-            if (account.getMoneyBalance().longValue() < 0)
-                throw new MoneyTransfersException(ExceptionList.MONEY_PARAMETER_SHOULD_CONTAIN_POSITIVE_VALUE, MONEY_BALANCE_PARAM);
-        } else {
-            account.setMoneyBalance(BigDecimal.ZERO);
-        }
-
-        //generate unique id for account
-        long accountId = getIdGenerator().generateAccountId();
-        account.setId(accountId);
-        account.setAccountType(account.getCreditLimit().longValue() > 0 ? AccountType.CREDIT : AccountType.DEBIT);
-
+        assertNotNull(accountRequest);
+        validateAccount(accountRequest);
+        Account account = convertResponseAccount(accountRequest);
         accounts.put(account.getId(), account);
 
         //generate the response
         response.status(HttpStatus.OK_200);
-        response.body(gson.toJson(accounts.get(accountId)));
+        response.body(gson.toJson(accounts.get(account.getId())));
 
         return response.body();
     }
@@ -141,32 +92,21 @@ public class RestService {
 
     public static String getUserByPassportId(Request request, Response response) {
         response.type(CONTENT_TYPE);
-
         String passportId = request.params(PASSPORT_ID_PARAM);
-
-        //check if user exist
-        if (!users.containsKey(passportId)) {
-            throw new MoneyTransfersException(ExceptionList.USER_NOT_FOUND, passportId);
-        }
+        assertUserExist(passportId);
         return gson.toJson(users.get(passportId));
     }
 
+
     public static String getAllAccounts(Request request, Response response) {
         response.type(CONTENT_TYPE);
-
         return gson.toJson(accounts.values());
     }
 
     public static String getAccountByAccountId(Request request, Response response) {
         response.type(CONTENT_TYPE);
-
         Long accountId = Long.valueOf(request.params(ACCOUNT_ID_PARAM));
-
-        //check if account exist
-        if (!accounts.containsKey(accountId)) {
-            throw new MoneyTransfersException(ExceptionList.ACCOUNT_NOT_FOUND, accountId.toString());
-        }
-
+        assertAccountExist(accountId);
         return gson.toJson(accounts.get(accountId));
     }
 
@@ -348,6 +288,25 @@ public class RestService {
         return gson.toJson(accounts.get(accountId));
     }
 
+    public static <T extends Exception> void generateException(MoneyTransfersException moneyTransfersException, Request request, Response response) {
+        response.status(moneyTransfersException.getHttpResponseCode());
+        response.type(CONTENT_TYPE);
+        response.body(gson.toJson(moneyTransfersException));
+    }
+
+    public static String handleInternalServerError(Request request, Response response) {
+        response.status(HttpStatus.BAD_REQUEST_400);
+        response.type(CONTENT_TYPE);
+        return gson.toJson(new MoneyTransfersException(ExceptionList.BAD_REQUEST));
+    }
+
+    public static void generateException(NumberFormatException e, Request request, Response response) {
+        MoneyTransfersException moneyTransfersException = new MoneyTransfersException(ExceptionList.WRONG_NUMBER_FORMAT);
+        response.status(moneyTransfersException.getHttpResponseCode());
+        response.type(CONTENT_TYPE);
+        response.body(gson.toJson(moneyTransfersException));
+    }
+
     public static void createSomeTestObjects() {
         User john = new User(1L, "John", "111");
         users.put(john.getPassportId(), john);
@@ -369,15 +328,57 @@ public class RestService {
         return IdGenerator.getInstance();
     }
 
-    public static <T extends Exception> void generateException(MoneyTransfersException moneyTransfersException, Request request, Response response) {
-        response.status(moneyTransfersException.getHttpResponseCode());
-        response.type(CONTENT_TYPE);
-        response.body(gson.toJson(moneyTransfersException));
+
+
+
+
+    private static void validateUser(UserRequest userRequest) {
+        //check for mandatory params
+        if (Objects.isNull(userRequest.getName())) {
+            throw new MoneyTransfersException(ExceptionList.MISSING_MANDATORY_PARAMETERS, NAME_PARAM);
+        }
+        String passportId = userRequest.getPassportId();
+        if (Objects.isNull(passportId)) {
+            throw new MoneyTransfersException(ExceptionList.MISSING_MANDATORY_PARAMETERS, PASSPORT_ID_PARAM);
+        }
+        //check is this object already exist
+        if (users.containsKey(passportId)) {
+            throw new MoneyTransfersException(ExceptionList.USER_ALREADY_EXIST, passportId);
+        }
     }
 
-    public static String handleInternalServerError(Request request, Response response) {
-        response.status(HttpStatus.BAD_REQUEST_400);
-        response.type(CONTENT_TYPE);
-        return gson.toJson(new MoneyTransfersException(ExceptionList.BAD_REQUEST));
+    private static void validateAccount(AccountRequest accountRequest) {
+        String passportId = accountRequest.getPassportId();
+        //check for mandatory params
+        if (Objects.isNull(passportId)) {
+            throw new MoneyTransfersException(ExceptionList.MISSING_MANDATORY_PARAMETERS, PASSPORT_ID_PARAM);
+        }
+        //check that user exist
+        if (!users.containsKey(passportId)) {
+            throw new MoneyTransfersException(ExceptionList.USER_NOT_FOUND, passportId);
+        }
+
+        //check that creditLimit and money balance not negative
+        if (accountRequest.getCreditLimit() != null && Double.valueOf(accountRequest.getCreditLimit()) < 0) {
+            throw new MoneyTransfersException(ExceptionList.MONEY_PARAMETER_SHOULD_CONTAIN_POSITIVE_VALUE, CREDIT_LIMIT_PARAM);
+        }
+
+        if (accountRequest.getMoneyBalance() != null && Double.valueOf(accountRequest.getMoneyBalance()) < 0)
+            throw new MoneyTransfersException(ExceptionList.MONEY_PARAMETER_SHOULD_CONTAIN_POSITIVE_VALUE, MONEY_BALANCE_PARAM);
     }
+
+    private static void assertUserExist(String passportId) {
+        //check if user exist
+        if (!users.containsKey(passportId)) {
+            throw new MoneyTransfersException(ExceptionList.USER_NOT_FOUND, passportId);
+        }
+    }
+
+    private static void assertAccountExist(Long accountId) {
+        //check if account exist
+        if (!accounts.containsKey(accountId)) {
+            throw new MoneyTransfersException(ExceptionList.ACCOUNT_NOT_FOUND, accountId.toString());
+        }
+    }
+
 }
