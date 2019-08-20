@@ -11,7 +11,8 @@ public enum ExceptionList {
     USER_NOT_FOUND("id5", "User with provided passportId does not exist: passportId=", HttpStatus.NOT_FOUND_404),
     ACCOUNT_NOT_FOUND("id6", "Account with provided accountId does not exist: accountId=", HttpStatus.NOT_FOUND_404),
     TRANSFER_NOT_FOUND("id7", "Transfers not found for account: accountId=", HttpStatus.NOT_FOUND_404),
-    WRONG_NUMBER_FORMAT("id8", "Cannot cast string to number value", HttpStatus.BAD_REQUEST_400);
+    WRONG_NUMBER_FORMAT("id8", "Bad Request. Cannot cast string to number value", HttpStatus.BAD_REQUEST_400),
+    CHOSE_DIFFERENT_ACCOUNT_IDS("id9", "accountFromId and accountToId parameters are equal. Please specify different.", HttpStatus.BAD_REQUEST_400);
 
     public String exceptionId;
     public String message;

@@ -15,7 +15,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class MoneyTransfersRorRestTest {
+public class MoneyTransferRestTest {
 
     private String USER_ALREADY_EXIST_MESSAGE_EXCEPTION = "User with provided passportId is already exist: passportId=";
     private String USER_DOES_NOT_EXIST_MESSAGE_EXCEPTION = "User with provided passportId does not exist: passportId=";
@@ -23,14 +23,14 @@ public class MoneyTransfersRorRestTest {
 
     @BeforeClass
     public static void init() {
-        MoneyTransfersRorRest.start();
+        MoneyTransferRest.start();
         RestAssured.baseURI = "http://localhost";
         RestAssured.port = 8082;
     }
 
     @AfterClass
     public static void stopServer() {
-        MoneyTransfersRorRest.stop();
+        MoneyTransferRest.stop();
     }
 
     @Test

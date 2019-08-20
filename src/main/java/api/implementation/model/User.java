@@ -1,5 +1,6 @@
 package api.implementation.model;
 
+import java.util.Collection;
 import java.util.Objects;
 
 public class User {
@@ -7,6 +8,7 @@ public class User {
     private long id;
     private String name;
     private String passportId;
+    private Collection<Account> accounts;
 
     public User(long id, String name, String passportId) {
         this.id = id;
@@ -39,6 +41,18 @@ public class User {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Collection<Account> getAccounts() {
+        return accounts;
+    }
+
+    public void setAccounts(Collection<Account> accounts) {
+        this.accounts = accounts;
+    }
+
+    public static User newInstance(User user) {
+        return new User(user.getId(), user.getName(), user.getPassportId());
     }
 
     @Override

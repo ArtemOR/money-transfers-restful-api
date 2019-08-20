@@ -1,5 +1,7 @@
 package api.implementation.model.transfer;
 
+import api.implementation.model.AccountTransfer;
+
 import java.util.Objects;
 
 public class InsideAccountTransfer extends AccountTransfer {

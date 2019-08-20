@@ -1,5 +1,7 @@
 package api.implementation.model.transfer;
 
+import api.implementation.model.AccountTransfer;
+
 import java.math.BigDecimal;
 import java.util.Objects;
 
@@ -11,6 +13,10 @@ public class BetweenAccountsTransfer extends AccountTransfer {
         super(accountToId, amount, time);
         this.accountFromId = accountFromId;
         this.id = transferId;
+    }
+
+    public BetweenAccountsTransfer() {
+
     }
 
     public Long getAccountFromId() {

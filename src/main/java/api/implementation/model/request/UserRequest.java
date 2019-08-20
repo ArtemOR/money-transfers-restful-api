@@ -4,7 +4,6 @@ import java.util.Objects;
 
 public class UserRequest {
 
-
     private String name;
     private String passportId;
 

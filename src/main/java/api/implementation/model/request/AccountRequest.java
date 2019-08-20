@@ -3,9 +3,9 @@ package api.implementation.model.request;
 import java.util.Objects;
 
 public class AccountRequest {
-    String passportId;
-    String moneyBalance;
-    String creditLimit;
+    private String passportId;
+    private String moneyBalance;
+    private String creditLimit;
 
     public String getPassportId() {
         return passportId;
