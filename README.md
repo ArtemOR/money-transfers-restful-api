@@ -27,9 +27,9 @@ Application uses port 8082
 
 Methods description:
 
-1. Create operations
+## 1. Create operations
 
-1.1 Create a user
+# 1.1 Create a user
 - Description: creates a user for a system
 - URL: /users
 - Method: POST
@@ -68,7 +68,7 @@ Error Responses:
 			"detailMessage": "Missing mandatory parameters: passportId"
 		   }
 
-1.2 Create an account
+# 1.2 Create an account
 - Description: create an account for a system
 - URL: /users
 - Method: POST
@@ -121,9 +121,9 @@ Error Responses:
     		"detailMessage": "accountFromId and accountToId parameters are equal. Please specify different."
 		   }
 		
-2 Read operations
+## 2 Read operations
 
-2.1 Retreive all users
+# 2.1 Retreive all users
 - Description: retrieves all users from system
 - URL: /users/getAll
 - Method: GET
@@ -141,7 +141,7 @@ Success Response:
 			}, ...
 		   ]
 
-2.2 Retreive user by passport id
+# 2.2 Retreive user by passport id
 - Description: retrieves user by user's passportId with all related accounts
 - URL: /users/{passportId}
 - Method: GET
@@ -182,7 +182,7 @@ Error Response:
 			"detailMessage": "User with provider passportId does not exist: passportId=2221"
 		   }
 
-2.3 Retrieve all accounts
+# 2.3 Retrieve all accounts
 - Description: retrieves all accounts from system
 - URL: /accounts/getAll
 - Method: GET
@@ -203,7 +203,7 @@ Success Response:
 			}, ...
 		  ]
 
-2.4 Retrieve account by account id
+# 2.4 Retrieve account by account id
 - Description: retrieves account by accounts id
 - URL: /accounts/{accountId}
 - Method: GET
@@ -230,7 +230,7 @@ Error Response:
 			"detailMessage": "Account with provider accountId does not exist: accountId=121"
 		   }
 
-2.5.1 Retrieve all transfers
+# 2.5.1 Retrieve all transfers
 - Description: retrieves all transfers
 - URL: /account/transfers
 - Method: GET
@@ -251,7 +251,7 @@ Success Response:
 			},...
 		]
 
-2.5.2 Retrieve transfers by reciever id
+# 2.5.2 Retrieve transfers by reciever id
 - Description: retrieves all transfers sent to account by accountToId
 - URL: /account/transfers?accountToId={accountToId}
 - Method: GET
@@ -280,7 +280,7 @@ Error Response:
 			"message": "Transfers not found for account: accountId={accountToId}"
 		   }
 
-2.5.3 Retrieve transfers by sender id
+# 2.5.3 Retrieve transfers by sender id
 - Description: retrieves all transfers sent from account by accountFromId
 - URL: /account/transfers?accountFromId={accountFromId}
 - Method: GET
@@ -309,9 +309,9 @@ Error Response:
 			"message": "Transfers not found for account: accountId={accountToId}"
 		  }
 
-3 Transfers Operations
+## 3 Transfers Operations
 
-3.1 Put money to account
+# 3.1 Put money to account
 - Description: increase balanse of account
 - URL: /accounts/recharge
 - Method: PUT
@@ -362,7 +362,7 @@ Error Response:
 			"detailMessage": "Bad Request. Cannot cast string to number value"
 		   }
 
-3.2 Transfers between accounts
+# 3.2 Transfers between accounts
 - Description: taking money from one account and put it to another
 - URL: /accounts/transfer
 - Method: PUT
@@ -424,9 +424,9 @@ Error Response:
 			"detailMessage": "Not enough money to complete the operation"
 		  }
 
-4 Delete Operations
+## 4 Delete Operations
 
-4.1 Delete a user by user passport id
+# 4.1 Delete a user by user passport id
 - Description: delete a user from a system by passport id and all accounts related to user
 - URL: /users/{passportId}
 - Method: DELETE
@@ -443,7 +443,7 @@ Error Responses:
 			"detailMessage": "User with provider passportId does not exist: passportId=111"
 		  }
 
-4.2 Delete an account by account id
+# 4.2 Delete an account by account id
 - Description: delete an acount from the system
 - URL: /accounts/{id}
 - Method: DELETE
