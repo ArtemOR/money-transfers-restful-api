@@ -20,6 +20,8 @@ To run application:
 
 OR: run jar file from root directory
 
+Application uses port 8082
+
 - in root directory placed PostMan Collection with call samples "transfer.postman_collection"
 - in memory already created some test objects of users and accounts
 
@@ -37,7 +39,7 @@ Methods description:
  Sample Call:
 
 
-	POST http://{host}/users
+	POST http://localhost:8082/users
 	Body: {
 			"name":"testUser",
 			"passportId":"12341"
@@ -75,7 +77,7 @@ Error Responses:
  
  Sample Call:
 
-	POST http://{host}/accounts
+	POST http://localhost:8082/accounts
 	Body: {
 			"passportId": "111",
 			"moneyBalance": 1000,
@@ -126,7 +128,7 @@ Error Responses:
 - URL: /users/getAll
 - Method: GET
 - Return:		List of users
-- Sample Call: GET http://{host}/users/getAll
+- Sample Call: GET http://localhost:8082/users/getAll
 	
 Success Response:
 	
@@ -145,7 +147,7 @@ Success Response:
 - Method: GET
 - Return:		User object with List of accounts
 
-Sample Call: GET http://{host}/users/111
+Sample Call: GET http://localhost:8082/users/111
 
 Success Response:
 	
@@ -186,7 +188,7 @@ Error Response:
 - Method: GET
 - Return:		List of accounts
 
-Sample Call: GET http://{host}/accounts/getAll
+Sample Call: GET http://localhost:8082/accounts/getAll
 
 Success Response:
 	
@@ -207,7 +209,7 @@ Success Response:
 - Method: GET
 - Return:		Account object
 
-Sample Call: GET http://{host}/accounts/11
+Sample Call: GET http://localhost:8082/accounts/11
 
 Success Response:
 	
@@ -234,7 +236,7 @@ Error Response:
 - Method: GET
 - Return:		List of transfers
 
-Sample Call: GET http://{host}/account/transfers
+Sample Call: GET http://localhost:8082/account/transfers
 
 Success Response:
 	
@@ -255,7 +257,7 @@ Success Response:
 - Method: GET
 - Return:		List of transfers
 
-Sample Call: GET http://{host}/account/transfers?accountToId=13
+Sample Call: GET http://localhost:8082/account/transfers?accountToId=13
 
 Success Response:
 	
@@ -284,7 +286,7 @@ Error Response:
 - Method: GET
 - Return:		List of transfers
 
-Sample Call: GET http://{host}/account/transfers?accountFromId=11
+Sample Call: GET http://localhost:8082/account/transfers?accountFromId=11
 
 Success Response:
 	
@@ -318,7 +320,7 @@ Error Response:
 
 Sample Call: 
 
-	PUT http://{host}/accounts/recharge
+	PUT http://localhost:8082/accounts/recharge
 	Body: {
 			"accountToId": 12,
 			"amount": 1050
@@ -369,7 +371,7 @@ Error Response:
 
 Sample Call: 
 	
-	PUT http://{host}/accounts/transfer
+	PUT http://localhost:8082/accounts/transfer
 	Body: {
 			"accountFromId": 11,
 			"accountToId": 13,
@@ -429,7 +431,7 @@ Error Response:
 - URL: /users/{passportId}
 - Method: DELETE
 
-Sample Call: DELETE http://{host}/users/111
+Sample Call: DELETE http://localhost:8082/users/111
 
 Success Response: HTTP Code: 204 Body: no Content
 
