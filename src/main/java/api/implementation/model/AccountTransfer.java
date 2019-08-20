@@ -1,4 +1,4 @@
-package api.implementation.model.transfer;
+package api.implementation.model;
 
 import java.math.BigDecimal;
 import java.util.Objects;
@@ -8,7 +8,7 @@ public class AccountTransfer {
     private BigDecimal amount;
     private Long time;
 
-    public AccountTransfer(Long accountToId, BigDecimal amount, Long time ) {
+    public AccountTransfer(Long accountToId, BigDecimal amount, Long time) {
         this.accountToId = accountToId;
         this.amount = amount;
         this.time = time;
@@ -59,6 +59,7 @@ public class AccountTransfer {
                 Objects.equals(amount, that.amount) &&
                 Objects.equals(time, that.time);
     }
+
     @Override
     public int hashCode() {
         return Objects.hash(accountToId, amount, time);

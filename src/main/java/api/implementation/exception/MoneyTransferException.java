@@ -1,22 +1,22 @@
 package api.implementation.exception;
 
-public class MoneyTransfersException extends RuntimeException {
+public class MoneyTransferException extends RuntimeException {
 
     private String errorCode;
     private transient int httpResponseCode;
 
-    public MoneyTransfersException(String errorCode, String message) {
+    public MoneyTransferException(String errorCode, String message) {
         super(message, null, false, false);
         this.errorCode = errorCode;
     }
 
-    public MoneyTransfersException(ExceptionList constant, String parameter) {
+    public MoneyTransferException(ExceptionList constant, String parameter) {
         super(constant.message + parameter, null, false, false);
         this.errorCode = constant.exceptionId;
         this.httpResponseCode = constant.httpStatus;
     }
 
-    public MoneyTransfersException(ExceptionList constant) {
+    public MoneyTransferException(ExceptionList constant) {
         super(constant.message, null, false, false);
         this.errorCode = constant.exceptionId;
         this.httpResponseCode = constant.httpStatus;

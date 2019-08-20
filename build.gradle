@@ -23,7 +23,7 @@ dependencies {
 jar {
     manifest {
         attributes(
-                'Main-Class': 'api.rest.MoneyTransfersRorRest'
+                'Main-Class': 'api.rest.MoneyTransferRest'
         )
     }
 }
