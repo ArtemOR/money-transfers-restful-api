@@ -11,6 +11,7 @@ import api.implementation.model.request.UserRequest;
 import java.util.List;
 import java.util.Objects;
 
+import static api.implementation.service.MoneyTransferRestService.transfers;
 import static api.implementation.service.MoneyTransferRestService.accounts;
 import static api.implementation.service.MoneyTransferRestService.users;
 import static api.implementation.service.StringConstants.*;
@@ -128,10 +129,17 @@ public class MoneyTransferRequestValidator {
         }
     }
 
+    static void assertTransferExist(Long transferId) {
+        //check if account exist
+        if (!transfers.containsKey(transferId)) {
+            throw new MoneyTransferException(ExceptionList.TRANSFER_NOT_FOUND, transferId.toString());
+        }
+    }
+
     static void assertTransfersExist(List<AccountTransfer> transfers, String accountId) {
         //check if account exist
         if (transfers.isEmpty()) {
-            throw new MoneyTransferException(ExceptionList.TRANSFER_NOT_FOUND, accountId);
+            throw new MoneyTransferException(ExceptionList.TRANSFERS_NOT_FOUND, accountId);
         }
     }
 

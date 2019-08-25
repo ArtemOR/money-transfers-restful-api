@@ -11,6 +11,7 @@ public class StringConstants {
     public static final String ACCOUNT_ID_PARAM = "accountId";
     public static final String ACCOUNT_TO_ID_PARAM = "accountToId";
     public static final String ACCOUNT_FROM_ID_PARAM = "accountFromId";
+    public static final String TRANSFER_ID_ID_PARAM = "transferId";
     public static final String CONTENT_TYPE = "application/json";
 
 }

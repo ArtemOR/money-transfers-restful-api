@@ -2,10 +2,7 @@ package api.implementation.service;
 
 import api.implementation.exception.ExceptionList;
 import api.implementation.exception.MoneyTransferException;
-import api.implementation.model.Account;
-import api.implementation.model.AccountTransfer;
-import api.implementation.model.AccountType;
-import api.implementation.model.User;
+import api.implementation.model.*;
 import api.implementation.model.request.AccountRequest;
 import api.implementation.model.request.TransferRequest;
 import api.implementation.model.request.UserRequest;
@@ -22,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static api.implementation.service.MoneyTransferModelConverver.*;
@@ -32,16 +30,14 @@ public class MoneyTransferRestService {
 
     private static Gson gson = new Gson();
 
-
-
     //store all created users
     static Map<String, User> users = new HashMap<>();
 
     //store all created accounts
-    static Map<Long, Account> accounts = new HashMap<>();
+    static Map<Long, Account> accounts = new ConcurrentHashMap<>();
 
     //store all transactions of transfers
-    private static Map<Long, AccountTransfer> accountTransfers = new HashMap<>();
+    static Map<Long, AccountTransfer> transfers = new HashMap<>();
 
     public static String createUser(Request request, Response response) {
         response.type(CONTENT_TYPE);
@@ -92,7 +88,9 @@ public class MoneyTransferRestService {
         assertUserExist(passportId);
         response.status(HttpStatus.OK_200);
         User userResponse = User.newInstance(users.get(passportId));
-        userResponse.setAccounts(accounts.values().stream().filter(acc->acc.getPassportId().equals(passportId)).collect(Collectors.toList()));
+        userResponse.setAccounts(accounts.values().stream().
+                filter(acc -> acc.getPassportId().equals(passportId)).
+                collect(Collectors.toList()));
         return gson.toJson(userResponse);
     }
 
@@ -110,33 +108,36 @@ public class MoneyTransferRestService {
         return gson.toJson(accounts.get(accountId));
     }
 
-    public static String getTransfersHistory(Request request, Response response) {
+    public static String getAllTransfersHistory(Request request, Response response) {
         response.type(CONTENT_TYPE);
+        response.status(HttpStatus.OK_200);
+        return gson.toJson(transfers.values());
+    }
 
-        List<AccountTransfer> transfers;
-        String accountId;
+    public static String getTransfersHistoryBySenderId(Request request, Response response) {
+        response.type(CONTENT_TYPE);
+        String accountId = request.params(ACCOUNT_FROM_ID_PARAM);
+        Long accountIdLong = Long.valueOf(accountId);
+        assertAccountExist(accountIdLong);
+        List<AccountTransfer> transfers = MoneyTransferRestService.transfers.values().stream()
+                .filter(at -> at.getClass().equals(BetweenAccountsTransfer.class))
+                .filter(at -> ((BetweenAccountsTransfer) at).getAccountFromId().equals(accountIdLong))
+                .collect(Collectors.toList());
 
-        // using param accountToId
-        if (Objects.nonNull(request.queryParams(ACCOUNT_TO_ID_PARAM))) {
-            accountId = request.queryParams(ACCOUNT_TO_ID_PARAM);
-            transfers = accountTransfers.values().stream().filter(at -> at.getAccountToId().equals(Long.valueOf(accountId))).collect(Collectors.toList());
-        }
+        //check if transfers for this account exist
+        assertTransfersExist(transfers, accountId);
+        response.status(HttpStatus.OK_200);
+        return gson.toJson(transfers);
+    }
 
-        //using param accountFromId
-        else if (Objects.nonNull(request.queryParams(ACCOUNT_FROM_ID_PARAM))) {
-            accountId = request.queryParams(ACCOUNT_FROM_ID_PARAM);
-            transfers = accountTransfers.values()
-                    .stream()
-                    .filter(at -> at.getClass().equals(BetweenAccountsTransfer.class))
-                    .filter(at -> ((BetweenAccountsTransfer) at).getAccountFromId().equals(Long.valueOf(accountId)))
-                    .collect(Collectors.toList());
-        }
-
-        //no params: All transfers
-        else {
-            response.status(HttpStatus.OK_200);
-            return gson.toJson(accountTransfers.values());
-        }
+    public static String getTransfersHistoryByReceiverId(Request request, Response response) {
+        response.type(CONTENT_TYPE);
+        String accountId = request.params(ACCOUNT_TO_ID_PARAM);
+        Long accountIdLong = Long.valueOf(accountId);
+        assertAccountExist(accountIdLong);
+        List<AccountTransfer> transfers = MoneyTransferRestService.transfers.values().stream().
+                filter(at -> at.getAccountToId().equals(accountIdLong)).
+                collect(Collectors.toList());
 
         //check if transfers for this account exist
         assertTransfersExist(transfers, accountId);
@@ -160,7 +161,7 @@ public class MoneyTransferRestService {
         account.setMoneyBalance(account.getMoneyBalance().add(transfer.getAmount()));
 
         //add object for transfers history
-        accountTransfers.put(transfer.getId(), transfer);
+        transfers.put(transfer.getId(), transfer);
 
         response.status(HttpStatus.OK_200);
 
@@ -185,12 +186,10 @@ public class MoneyTransferRestService {
         accountTo.setMoneyBalance(accountTo.getMoneyBalance().add(value));
 
         //create object for transfers history
-        accountTransfers.put(betweenAccountsTransfer.getId(), betweenAccountsTransfer);
+        transfers.put(betweenAccountsTransfer.getId(), betweenAccountsTransfer);
 
         response.status(HttpStatus.OK_200);
-        response.body(gson.toJson(Arrays.asList(accountFrom, accountTo)));
-
-        return response.body();
+        return gson.toJson(betweenAccountsTransfer);
     }
 
     //TODO: it is better not to remove users and its binded accounts, but make it NOT ACTIVE. For further improvement
@@ -228,6 +227,19 @@ public class MoneyTransferRestService {
         response.status(HttpStatus.NO_CONTENT_204);
 
         return gson.toJson(accounts.get(accountId));
+    }
+
+    public static String deleteTransferByTransferId(Request request, Response response) {
+        response.type(CONTENT_TYPE);
+
+        Long transferId = Long.valueOf(request.params(TRANSFER_ID_ID_PARAM));
+
+        assertTransferExist(transferId);
+
+        transfers.remove(transferId);
+        response.status(HttpStatus.NO_CONTENT_204);
+
+        return gson.toJson(transfers.get(transferId));
     }
 
     public static void generateException(MoneyTransferException moneyTransferException, Request request, Response response) {

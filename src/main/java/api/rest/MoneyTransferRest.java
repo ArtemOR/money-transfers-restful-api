@@ -17,12 +17,12 @@ public class MoneyTransferRest {
 
     private static final String ACCEPT_TYPE = "application/json";
 
-    static void start() {
+    public static void start() {
         MoneyTransferRest.main(null);
         Spark.awaitInitialization();
     }
 
-    static void stop() {
+    public static void stop() {
         Spark.stop();
         Spark.awaitStop();
     }
@@ -47,7 +47,11 @@ public class MoneyTransferRest {
 
         get("/accounts/:accountId", ACCEPT_TYPE, MoneyTransferRestService::getAccountByAccountId);
 
-        get("/account/transfers", ACCEPT_TYPE, MoneyTransferRestService::getTransfersHistory);
+        get("/accounts/transfers/getAll", ACCEPT_TYPE, MoneyTransferRestService::getAllTransfersHistory);
+
+        get("/accounts/transfers/accountFromId/:accountFromId", ACCEPT_TYPE, MoneyTransferRestService::getTransfersHistoryBySenderId);
+
+        get("/accounts/transfers/accountToId/:accountToId", ACCEPT_TYPE, MoneyTransferRestService::getTransfersHistoryByReceiverId);
 
         put("/accounts/recharge", ACCEPT_TYPE, MoneyTransferRestService::addMoneyToAccount);
 
@@ -56,6 +60,8 @@ public class MoneyTransferRest {
         delete("/users/:passportId", ACCEPT_TYPE, MoneyTransferRestService::deleteUserByPassportId);
 
         delete("/accounts/:accountId", ACCEPT_TYPE, MoneyTransferRestService::deleteAccountByAccountId);
+
+        delete("/accounts/transfers/:transferId", ACCEPT_TYPE, MoneyTransferRestService::deleteTransferByTransferId);
 
         exception(MoneyTransferException.class, MoneyTransferRestService::generateException);
 
