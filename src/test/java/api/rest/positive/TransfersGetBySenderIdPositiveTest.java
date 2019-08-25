@@ -31,7 +31,7 @@ public class TransfersGetBySenderIdPositiveTest {
     }
 
     @Test
-    public void MTRA_080101_getTransfersByReceiverId_whenMethodIsCalls_thenTransfersReturn() {
+    public void MTRA_090101_getTransfersByReceiverId_whenMethodIsCalls_thenTransfersReturn() {
         //prepare data
         createUser(USER_NAME1, PASSPORT_ID1);
         createUser(USER_NAME2, PASSPORT_ID2);
