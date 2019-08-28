@@ -1,5 +1,6 @@
 package api.rest.positive;
 
+import api.rest.TestPayloadBuilder;
 import api.rest.MoneyTransferRest;
 import io.restassured.RestAssured;
 import org.eclipse.jetty.http.HttpStatus;
@@ -13,7 +14,7 @@ import static io.restassured.RestAssured.get;
 import static io.restassured.RestAssured.given;
 import static org.junit.Assert.assertEquals;
 
-public class TransferMoneyBetweenAccountPositiveTest {
+public class UpdateTransferMoneyBetweenAccountPositiveTest {
     @BeforeClass
     public static void init() {
         MoneyTransferRest.start();
@@ -34,13 +35,10 @@ public class TransferMoneyBetweenAccountPositiveTest {
 
         String accountFromId = createAccountWithMoney(PASSPORT_ID1, MONEY_VALUE);
         String accountToId = createEmptyAccount(PASSPORT_ID2);
+        String payload = new TestPayloadBuilder().setAccountFromId(accountFromId).setAccountToId(accountToId).setAmount(SMALL_MONEY_VALUE).buildPayload();
 
         //test
-        String transferId = given().body("{\n" +
-                "\"accountFromId\": " + accountFromId + ",\n" +
-                "\"accountToId\": " + accountToId + ",\n" +
-                "\"amount\": " + SMALL_MONEY_VALUE + "\n" +
-                "}").
+        String transferId = given().body(payload).
                 when().put("/accounts/transfer").then().
                 assertThat().statusCode(HttpStatus.OK_200).extract().jsonPath().getString(ID_PARAM);
 
@@ -72,13 +70,10 @@ public class TransferMoneyBetweenAccountPositiveTest {
 
         String accountFromId = createAccountWithCreditMoney(PASSPORT_ID1, MONEY_VALUE);
         String accountToId = createEmptyAccount(PASSPORT_ID2);
+        String payload = new TestPayloadBuilder().setAccountFromId(accountFromId).setAccountToId(accountToId).setAmount(SMALL_MONEY_VALUE).buildPayload();
 
         //test
-        String transferId = given().body("{\n" +
-                "\"accountFromId\": " + accountFromId + ",\n" +
-                "\"accountToId\": " + accountToId + ",\n" +
-                "\"amount\": " + SMALL_MONEY_VALUE + "\n" +
-                "}").
+        String transferId = given().body(payload).
                 when().put("/accounts/transfer").then().
                 assertThat().statusCode(HttpStatus.OK_200).extract().jsonPath().getString(ID_PARAM);
 

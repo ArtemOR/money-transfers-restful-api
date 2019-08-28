@@ -1,4 +1,4 @@
-package api.rest.negative;
+package api.rest.positive;
 
 import api.rest.MoneyTransferRest;
 import io.restassured.RestAssured;
@@ -9,10 +9,13 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static api.rest.TestConstants.*;
+import static api.rest.TestHelper.cleanUser;
+import static api.rest.TestHelper.createUser;
+import static io.restassured.RestAssured.delete;
 import static io.restassured.RestAssured.get;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
-public class GetAccountByAccountIdNegativeTest {
+public class DeleteUserByPassportIdPositiveTest {
     @BeforeClass
     public static void init() {
         MoneyTransferRest.start();
@@ -26,15 +29,21 @@ public class GetAccountByAccountIdNegativeTest {
     }
 
     @Test
-    public void MTRA_060201_getAccount_whenAccountIdDoesNotExist_ThenExceptionIsThrown() {
+    public void MTRA_120101_deleteUser_whenPassportIdExist_thenOperationExecute() {
+        //prepare data
+        createUser(USER_NAME1, PASSPORT_ID1);
+
+
         //test
-        JsonPath readResult = get("/accounts/" + ID_NON_EXIST).then()
+        delete("/users/"+PASSPORT_ID1).then()
                 .assertThat()
-                .statusCode(HttpStatus.NOT_FOUND_404).
+                .statusCode(HttpStatus.NO_CONTENT_204).
                         extract().jsonPath();
 
         //verify
-        String actualException = readResult.getString(DETAIL_MESSAGE_REQUEST_PARAM);
-        assertTrue(actualException.contains(ACCOUNT_NOT_FOUND_EXCEPTION));
+        get("/users/"+PASSPORT_ID1).then()
+                .assertThat()
+                .statusCode(HttpStatus.NOT_FOUND_404);
+
     }
 }

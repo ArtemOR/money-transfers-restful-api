@@ -30,10 +30,9 @@ public class TestHelper {
     }
 
     public static void createUser(String name, String passportId) {
-        given().body("{\n" +
-                "\"name\": " + name + ",\n" +
-                "\"passportId\":" + passportId + "\n" +
-                "}").
+        String payload = new TestPayloadBuilder().setName(name).setPassportId(passportId).buildPayload();
+
+        given().body(payload).
                 when().
                 post("/users").
                 then().
@@ -43,37 +42,33 @@ public class TestHelper {
     }
 
     public static String createAccountWithMoney(String passportId, String moneyBalance) {
-        return given().body("{\n" +
-                "\"passportId\": " + passportId + ",\n" +
-                "\"moneyBalance\": " + moneyBalance + " \n" +
-                "}").
+        String payload = new TestPayloadBuilder().setPassportId(passportId).setMoneyBalance(moneyBalance).buildPayload();
+
+        return given().body(payload).
                 when().post("/accounts").then().
                 assertThat().statusCode(HttpStatus.OK_200).extract().jsonPath().getString(ID_PARAM);
     }
 
     public static String createAccountWithCreditMoney(String passportId, String creditLimit) {
-        return given().body("{\n" +
-                "\"passportId\": " + passportId + ",\n" +
-                "\"creditLimit\": " + creditLimit + " \n" +
-                "}").
+        String payload = new TestPayloadBuilder().setPassportId(passportId).setCreditLimit(creditLimit).buildPayload();
+
+        return given().body(payload).
                 when().post("/accounts").then().
                 assertThat().statusCode(HttpStatus.OK_200).extract().jsonPath().getString(ID_PARAM);
     }
 
     public static String createEmptyAccount(String passportId) {
-        return given().body("{\n" +
-                "\"passportId\": " + passportId + "\n" +
-                "}").
+        String payload = new TestPayloadBuilder().setPassportId(passportId).buildPayload();
+
+        return given().body(payload).
                 when().post("/accounts").then().
                 assertThat().statusCode(HttpStatus.OK_200).extract().jsonPath().getString(ID_PARAM);
     }
 
     public static String transferMoneyBetweenAccounts(String accountFromId, String accountToId, String value) {
-        return given().body("{\n" +
-                "\"accountFromId\": " + accountFromId + ",\n" +
-                "\"accountToId\": " + accountToId + ",\n" +
-                "\"amount\": " + value + "\n" +
-                "}").
+        String payload = new TestPayloadBuilder().setAccountFromId(accountFromId).setAccountToId(accountToId).setAmount(value).buildPayload();
+
+        return given().body(payload).
                 when().put("/accounts/transfer").then().
                 assertThat().statusCode(HttpStatus.OK_200).extract().jsonPath().getString(ID_PARAM);
     }

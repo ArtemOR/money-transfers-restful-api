@@ -1,5 +1,6 @@
 package api.rest.positive;
 
+import api.rest.TestPayloadBuilder;
 import api.rest.MoneyTransferRest;
 import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
@@ -36,11 +37,11 @@ public class CreateUserPositiveTest {
                 .assertThat()
                 .statusCode(HttpStatus.NOT_FOUND_404);
 
+        //prepate data
+        String payload = new TestPayloadBuilder().setName(USER_NAME1).setPassportId(PASSPORT_ID1).buildPayload();
+
         //test
-        given().body("{\n" +
-                "\"name\": " + USER_NAME1 + ",\n" +
-                "\"passportId\":" + PASSPORT_ID1 + "\n" +
-                "}").
+        given().body(payload).
                 when().
                 post("/users").
                 then().

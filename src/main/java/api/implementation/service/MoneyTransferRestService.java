@@ -14,7 +14,6 @@ import spark.Request;
 import spark.Response;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +21,7 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import static api.implementation.service.MoneyTransferModelConverver.*;
+import static api.implementation.service.MoneyTransferModelConverter.*;
 import static api.implementation.service.MoneyTransferRequestValidator.*;
 import static api.implementation.service.StringConstants.*;
 
@@ -40,8 +39,6 @@ public class MoneyTransferRestService {
     static Map<Long, AccountTransfer> transfers = new HashMap<>();
 
     public static String createUser(Request request, Response response) {
-        response.type(CONTENT_TYPE);
-
         //read the body of request
         String requestBody = request.body();
         UserRequest userRequest = gson.fromJson(requestBody, UserRequest.class);
@@ -58,8 +55,6 @@ public class MoneyTransferRestService {
     }
 
     public static String createAccount(Request request, Response response) {
-        response.type(CONTENT_TYPE);
-
         String requestBody = request.body();
         AccountRequest accountRequest = gson.fromJson(requestBody, AccountRequest.class);
 
@@ -77,13 +72,11 @@ public class MoneyTransferRestService {
     }
 
     public static String getAllUsers(Request request, Response response) {
-        response.type(CONTENT_TYPE);
         response.status(HttpStatus.OK_200);
         return gson.toJson(users.values());
     }
 
     public static String getUserByPassportId(Request request, Response response) {
-        response.type(CONTENT_TYPE);
         String passportId = request.params(PASSPORT_ID_PARAM);
         assertUserExist(passportId);
         response.status(HttpStatus.OK_200);
@@ -95,13 +88,11 @@ public class MoneyTransferRestService {
     }
 
     public static String getAllAccounts(Request request, Response response) {
-        response.type(CONTENT_TYPE);
         response.status(HttpStatus.OK_200);
         return gson.toJson(accounts.values());
     }
 
     public static String getAccountByAccountId(Request request, Response response) {
-        response.type(CONTENT_TYPE);
         Long accountId = Long.valueOf(request.params(ACCOUNT_ID_PARAM));
         assertAccountExist(accountId);
         response.status(HttpStatus.OK_200);
@@ -109,13 +100,11 @@ public class MoneyTransferRestService {
     }
 
     public static String getAllTransfersHistory(Request request, Response response) {
-        response.type(CONTENT_TYPE);
         response.status(HttpStatus.OK_200);
         return gson.toJson(transfers.values());
     }
 
     public static String getTransfersHistoryBySenderId(Request request, Response response) {
-        response.type(CONTENT_TYPE);
         String accountId = request.params(ACCOUNT_FROM_ID_PARAM);
         Long accountIdLong = Long.valueOf(accountId);
         assertAccountExist(accountIdLong);
@@ -131,7 +120,6 @@ public class MoneyTransferRestService {
     }
 
     public static String getTransfersHistoryByReceiverId(Request request, Response response) {
-        response.type(CONTENT_TYPE);
         String accountId = request.params(ACCOUNT_TO_ID_PARAM);
         Long accountIdLong = Long.valueOf(accountId);
         assertAccountExist(accountIdLong);
@@ -146,8 +134,6 @@ public class MoneyTransferRestService {
     }
 
     public static String addMoneyToAccount(Request request, Response response) {
-        response.type(CONTENT_TYPE);
-
         String requestBody = request.body();
         TransferRequest transferRequest = gson.fromJson(requestBody, TransferRequest.class);
 
@@ -169,8 +155,6 @@ public class MoneyTransferRestService {
     }
 
     public static String transferMoneyBetweenAccounts(Request request, Response response) {
-        response.type(CONTENT_TYPE);
-
         String requestBody = request.body();
         TransferRequest transferRequest = gson.fromJson(requestBody, TransferRequest.class);
 
@@ -194,8 +178,6 @@ public class MoneyTransferRestService {
 
     //TODO: it is better not to remove users and its binded accounts, but make it NOT ACTIVE. For further improvement
     public static String deleteUserByPassportId(Request request, Response response) {
-        response.type(CONTENT_TYPE);
-
         String passportId = request.params(PASSPORT_ID_PARAM);
 
         assertUserExist(passportId);
@@ -217,8 +199,6 @@ public class MoneyTransferRestService {
 
     //TODO: it is better not to remove account, but make it NOT ACTIVE. For further improvement
     public static String deleteAccountByAccountId(Request request, Response response) {
-        response.type(CONTENT_TYPE);
-
         Long accountId = Long.valueOf(request.params(ACCOUNT_ID_PARAM));
 
         assertAccountExist(accountId);
@@ -230,8 +210,6 @@ public class MoneyTransferRestService {
     }
 
     public static String deleteTransferByTransferId(Request request, Response response) {
-        response.type(CONTENT_TYPE);
-
         Long transferId = Long.valueOf(request.params(TRANSFER_ID_ID_PARAM));
 
         assertTransferExist(transferId);

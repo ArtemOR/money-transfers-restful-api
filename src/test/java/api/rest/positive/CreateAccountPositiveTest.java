@@ -1,5 +1,6 @@
 package api.rest.positive;
 
+import api.rest.TestPayloadBuilder;
 import api.rest.MoneyTransferRest;
 import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
@@ -36,11 +37,10 @@ public class CreateAccountPositiveTest {
     public void MTRA_020101_createAccount_whenAccountCreatesWithOnlyPassportID_thenZeroMoneyDebitAccountInResponse() {
         //prepare data
         createUser(USER_NAME1, PASSPORT_ID1);
+        String payload = new TestPayloadBuilder().setPassportId(PASSPORT_ID1).buildPayload();
 
         //test
-        JsonPath createResult = given().body("{\n" +
-                "\"passportId\": " + PASSPORT_ID1 + "\n" +
-                "}").
+        JsonPath createResult = given().body(payload).
                 when().post("/accounts").then().
                 assertThat().statusCode(HttpStatus.OK_200).
                 extract().jsonPath();
@@ -65,19 +65,14 @@ public class CreateAccountPositiveTest {
     public void MTRA_020102_createAccount_whenTwoSimilarAccountCreates_thenUserHasTwoAccounts() {
         //prepare data
         createUser(USER_NAME1, PASSPORT_ID1);
+        String payload = new TestPayloadBuilder().setPassportId(PASSPORT_ID1).setMoneyBalance(MONEY_VALUE).buildPayload();
 
         //test
-        given().body("{\n" +
-                "\"passportId\": " + PASSPORT_ID1 + ",\n" +
-                "\"moneyBalance\": " + MONEY_VALUE + " \n" +
-                "}").
+        given().body(payload).
                 when().post("/accounts").then().
                 assertThat().statusCode(HttpStatus.OK_200);
 
-        given().body("{\n" +
-                "\"passportId\": " + PASSPORT_ID1 + ",\n" +
-                "\"moneyBalance\": " + MONEY_VALUE + " \n" +
-                "}").
+        given().body(payload).
                 when().post("/accounts").then().
                 assertThat().statusCode(HttpStatus.OK_200);
 
@@ -102,12 +97,10 @@ public class CreateAccountPositiveTest {
     public void MTRA_020103_createAccount_whenAccountCreatesWithPositiveBalance_thenDebitAccountWithMoneyBalanceInResponse() {
         //prepare data
         createUser(USER_NAME1, PASSPORT_ID1);
+        String payload = new TestPayloadBuilder().setPassportId(PASSPORT_ID1).setMoneyBalance(MONEY_VALUE).buildPayload();
 
         //test
-        JsonPath createResult = given().body("{\n" +
-                "\"passportId\": " + PASSPORT_ID1 + ",\n" +
-                "\"moneyBalance\": " + MONEY_VALUE + " \n" +
-                "}").
+        JsonPath createResult = given().body(payload).
                 when().post("/accounts").then().
                 assertThat().statusCode(HttpStatus.OK_200).
                 extract().jsonPath();
@@ -138,12 +131,10 @@ public class CreateAccountPositiveTest {
     public void MTRA_020104_createAccount_whenAccountCreatesWithCreditLimit_thenCreditAccountWithCreditMoneyAccountInResponse() {
         //prepare data
         createUser(USER_NAME1, PASSPORT_ID1);
+        String payload = new TestPayloadBuilder().setPassportId(PASSPORT_ID1).setCreditLimit(MONEY_VALUE).buildPayload();
 
         //test
-        JsonPath createResult = given().body("{\n" +
-                "\"passportId\": " + PASSPORT_ID1 + ",\n" +
-                "\"creditLimit\": " + MONEY_VALUE + " \n" +
-                "}").
+        JsonPath createResult = given().body(payload).
                 when().post("/accounts").then().
                 assertThat().statusCode(HttpStatus.OK_200).
                 extract().jsonPath();
@@ -164,4 +155,31 @@ public class CreateAccountPositiveTest {
         cleanUser(PASSPORT_ID1);
     }
 
+    @Test
+    public void MTRA_020105_createAccount_whenAccountCreatesWithCreditLimitAndMoneyBalance_thenCreditAccountWithMoneyInResponse() {
+        //prepare data
+        createUser(USER_NAME1, PASSPORT_ID1);
+        String payload = new TestPayloadBuilder().setPassportId(PASSPORT_ID1).setMoneyBalance(MONEY_VALUE).setCreditLimit(MONEY_VALUE).buildPayload();
+
+        //test
+        JsonPath createResult = given().body(payload).
+                when().post("/accounts").then().
+                assertThat().statusCode(HttpStatus.OK_200).
+                extract().jsonPath();
+
+        //verify
+        String passportId = createResult.getString(PASSPORT_ID_PARAM);
+        String moneyBalance = createResult.getString(MONEY_BALANCE_PARAM);
+        String accountType = createResult.getString(ACCOUNT_TYPE_PARAM);
+        String creditLimit = createResult.getString(CREDIT_LIMIT_PARAM);
+        assertEquals(PASSPORT_ID1, passportId);
+        assertEquals(MONEY_VALUE, moneyBalance);
+        assertEquals(CREDIT_VALUE, accountType);
+        assertEquals(MONEY_VALUE, creditLimit);
+
+        //cleanup
+        String id = createResult.getString(ID_PARAM);
+        cleanAccount(id);
+        cleanUser(PASSPORT_ID1);
+    }
 }

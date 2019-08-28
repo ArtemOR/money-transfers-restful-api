@@ -4,14 +4,7 @@ import api.implementation.exception.MoneyTransferException;
 import api.implementation.service.MoneyTransferRestService;
 import spark.Spark;
 
-import static spark.Spark.delete;
-import static spark.Spark.exception;
-import static spark.Spark.get;
-import static spark.Spark.internalServerError;
-import static spark.Spark.port;
-import static spark.Spark.post;
-import static spark.Spark.put;
-import static spark.Spark.threadPool;
+import static spark.Spark.*;
 
 public class MoneyTransferRest {
 
@@ -32,36 +25,36 @@ public class MoneyTransferRest {
         MoneyTransferRestService.createSomeTestObjects();
 
         threadPool(100);
-
         port(8082);
+        after((request, response) -> response.type(ACCEPT_TYPE));
 
-        post("/users", ACCEPT_TYPE, MoneyTransferRestService::createUser);
+        post("/users", MoneyTransferRestService::createUser);
 
-        post("/accounts", ACCEPT_TYPE, MoneyTransferRestService::createAccount);
+        post("/accounts", MoneyTransferRestService::createAccount);
 
-        get("/users/getAll", ACCEPT_TYPE, MoneyTransferRestService::getAllUsers);
+        get("/users/getAll", MoneyTransferRestService::getAllUsers);
 
-        get("/users/:passportId", ACCEPT_TYPE, MoneyTransferRestService::getUserByPassportId);
+        get("/users/:passportId", MoneyTransferRestService::getUserByPassportId);
 
-        get("/accounts/getAll", ACCEPT_TYPE, MoneyTransferRestService::getAllAccounts);
+        get("/accounts/getAll", MoneyTransferRestService::getAllAccounts);
 
-        get("/accounts/:accountId", ACCEPT_TYPE, MoneyTransferRestService::getAccountByAccountId);
+        get("/accounts/:accountId", MoneyTransferRestService::getAccountByAccountId);
 
-        get("/accounts/transfers/getAll", ACCEPT_TYPE, MoneyTransferRestService::getAllTransfersHistory);
+        get("/accounts/transfers/getAll", MoneyTransferRestService::getAllTransfersHistory);
 
-        get("/accounts/transfers/accountFromId/:accountFromId", ACCEPT_TYPE, MoneyTransferRestService::getTransfersHistoryBySenderId);
+        get("/accounts/transfers/accountFromId/:accountFromId", MoneyTransferRestService::getTransfersHistoryBySenderId);
 
-        get("/accounts/transfers/accountToId/:accountToId", ACCEPT_TYPE, MoneyTransferRestService::getTransfersHistoryByReceiverId);
+        get("/accounts/transfers/accountToId/:accountToId", MoneyTransferRestService::getTransfersHistoryByReceiverId);
 
-        put("/accounts/recharge", ACCEPT_TYPE, MoneyTransferRestService::addMoneyToAccount);
+        put("/accounts/recharge", MoneyTransferRestService::addMoneyToAccount);
 
-        put("/accounts/transfer", ACCEPT_TYPE, MoneyTransferRestService::transferMoneyBetweenAccounts);
+        put("/accounts/transfer", MoneyTransferRestService::transferMoneyBetweenAccounts);
 
-        delete("/users/:passportId", ACCEPT_TYPE, MoneyTransferRestService::deleteUserByPassportId);
+        delete("/users/:passportId", MoneyTransferRestService::deleteUserByPassportId);
 
-        delete("/accounts/:accountId", ACCEPT_TYPE, MoneyTransferRestService::deleteAccountByAccountId);
+        delete("/accounts/:accountId", MoneyTransferRestService::deleteAccountByAccountId);
 
-        delete("/accounts/transfers/:transferId", ACCEPT_TYPE, MoneyTransferRestService::deleteTransferByTransferId);
+        delete("/accounts/transfers/:transferId", MoneyTransferRestService::deleteTransferByTransferId);
 
         exception(MoneyTransferException.class, MoneyTransferRestService::generateException);
 

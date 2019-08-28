@@ -1,5 +1,6 @@
 package api.rest.negative;
 
+import api.rest.TestPayloadBuilder;
 import api.rest.MoneyTransferRest;
 import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
@@ -15,7 +16,7 @@ import static io.restassured.RestAssured.given;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class TransferMoneyBetweenAccountNegativeTest {
+public class UpdateTransferMoneyBetweenAccountNegativeTest {
     @BeforeClass
     public static void init() {
         MoneyTransferRest.start();
@@ -32,16 +33,12 @@ public class TransferMoneyBetweenAccountNegativeTest {
     public void MTRA_110201_moneyTransfer_whenAccountDoesNotExist_ThenExceptionIsThrown() {
         //prepare data
         createUser(USER_NAME1, PASSPORT_ID1);
-
         String accountFromId = createAccountWithMoney(PASSPORT_ID1, MONEY_VALUE);
         String accountToId = ID_NON_EXIST;
+        String payload = new TestPayloadBuilder().setAccountFromId(accountFromId).setAccountToId(accountToId).setAmount(SMALL_MONEY_VALUE).buildPayload();
 
         //test
-        JsonPath actual = given().body("{\n" +
-                "\"accountFromId\": " + accountFromId + ",\n" +
-                "\"accountToId\": " + accountToId + ",\n" +
-                "\"amount\": " + SMALL_MONEY_VALUE + "\n" +
-                "}").
+        JsonPath actual = given().body(payload).
                 when().put("/accounts/transfer").then().
                 assertThat().statusCode(HttpStatus.NOT_FOUND_404).extract().jsonPath();
 
@@ -60,16 +57,12 @@ public class TransferMoneyBetweenAccountNegativeTest {
         //prepare data
         createUser(USER_NAME1, PASSPORT_ID1);
         createUser(USER_NAME2, PASSPORT_ID2);
-
         String accountFromId = createAccountWithMoney(PASSPORT_ID1, MONEY_VALUE);
         String accountToId = createEmptyAccount(PASSPORT_ID2);
+        String payload = new TestPayloadBuilder().setAccountFromId(accountFromId).setAccountToId(accountToId).setAmount(BIG_MONEY_VALUE).buildPayload();
 
         //test
-        JsonPath actual = given().body("{\n" +
-                "\"accountFromId\": " + accountFromId + ",\n" +
-                "\"accountToId\": " + accountToId + ",\n" +
-                "\"amount\": " + BIG_MONEY_VALUE + "\n" +
-                "}").
+        JsonPath actual = given().body(payload).
                 when().put("/accounts/transfer").then().
                 assertThat().statusCode(HttpStatus.BAD_REQUEST_400).extract().jsonPath();
 
@@ -87,13 +80,10 @@ public class TransferMoneyBetweenAccountNegativeTest {
         //prepare data
         createUser(USER_NAME1, PASSPORT_ID1);
         String accountFromId = createAccountWithMoney(PASSPORT_ID1, MONEY_VALUE);
+        String payload = new TestPayloadBuilder().setAccountFromId(accountFromId).setAccountToId(accountFromId).setAmount(SMALL_MONEY_VALUE).buildPayload();
 
         //test
-        JsonPath actual = given().body("{\n" +
-                "\"accountFromId\": " + accountFromId + ",\n" +
-                "\"accountToId\": " + accountFromId + ",\n" +
-                "\"amount\": " + SMALL_MONEY_VALUE + "\n" +
-                "}").
+        JsonPath actual = given().body(payload).
                 when().put("/accounts/transfer").then().
                 assertThat().statusCode(HttpStatus.BAD_REQUEST_400).extract().jsonPath();
 

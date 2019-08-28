@@ -13,7 +13,7 @@ import api.implementation.model.transfer.InsideAccountTransfer;
 import java.math.BigDecimal;
 import java.util.Objects;
 
-public class MoneyTransferModelConverver {
+public class MoneyTransferModelConverter {
 
     static User convertUserRequest(UserRequest userRequest) {
         User user = new User();

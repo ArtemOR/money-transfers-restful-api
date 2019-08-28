@@ -1,5 +1,6 @@
 package api.rest.negative;
 
+import api.rest.TestPayloadBuilder;
 import api.rest.MoneyTransferRest;
 import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
@@ -30,10 +31,11 @@ public class CreateUserNegativeTest {
 
     @Test
     public void MTRA_010201_createUser_whenUserCreatesWithoutMandatoryParam_thenExceptionThrows() {
+        //prepare data
+        String payload = new TestPayloadBuilder().setName(USER_NAME1).buildPayload();
+
         //test
-        JsonPath createResult = given().body("{\n" +
-                "\"name\": " + USER_NAME1 +
-                "}").
+        JsonPath createResult = given().body(payload).
                 when().
                 post("/users").
                 then().
@@ -50,12 +52,10 @@ public class CreateUserNegativeTest {
     public void MTRA_010202_createUser_whenUserCreatesWithSamePassportId_thenExceptionThrows() {
         //prepare data
         createUser(USER_NAME1, PASSPORT_ID1);
+        String payload = new TestPayloadBuilder().setName(USER_NAME1).setPassportId(PASSPORT_ID1).buildPayload();
 
         //test
-        JsonPath createResult = given().body("{\n" +
-                "\"name\": " + USER_NAME1 + ",\n" +
-                "\"passportId\":" + PASSPORT_ID1 + "\n" +
-                "}").
+        JsonPath createResult = given().body(payload).
                 when().
                 post("/users").
                 then().

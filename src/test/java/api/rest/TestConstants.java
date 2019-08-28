@@ -36,7 +36,7 @@ public class TestConstants {
     public static String MONEY_PARAMETER_SHOULD_CONTAIN_POSITIVE_VALUE_EXCEPTION = "Money parameter should contains positive value: parameter=";
     public static String NOT_ENOUGH_MONEY_EXCEPTION = "Not enough money to complete the operation";
     public static String USER_NOT_FOUND_EXCEPTION = "User with provided passportId does not exist: passportId=";
-    public static String TRANSFER_NOT_FOUND_EXCEPTION = "Transfer with provided transferId does not exist: passportId=";
+    public static String TRANSFER_NOT_FOUND_EXCEPTION = "Transfer with provided transferId does not exist: transferId=";
     public static String ACCOUNT_NOT_FOUND_EXCEPTION = "Account with provided accountId does not exist: accountId=";
     public static String TRANSFERS_NOT_FOUND_EXCEPTION = "Transfers not found for account: accountId=";
     public static String WRONG_NUMBER_FORMAT_EXCEPTION = "Bad Request. Cannot cast string to number value";

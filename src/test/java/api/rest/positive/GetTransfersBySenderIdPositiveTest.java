@@ -17,7 +17,7 @@ import static io.restassured.RestAssured.get;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class TransfersGetBySenderIdPositiveTest {
+public class GetTransfersBySenderIdPositiveTest {
     @BeforeClass
     public static void init() {
         MoneyTransferRest.start();

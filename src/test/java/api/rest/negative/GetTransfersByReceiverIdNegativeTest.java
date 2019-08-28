@@ -13,7 +13,7 @@ import static api.rest.TestHelper.*;
 import static io.restassured.RestAssured.get;
 import static org.junit.Assert.assertTrue;
 
-public class TransfersGetBySenderIdNegativeTest {
+public class GetTransfersByReceiverIdNegativeTest {
     @BeforeClass
     public static void init() {
         MoneyTransferRest.start();
@@ -27,12 +27,12 @@ public class TransfersGetBySenderIdNegativeTest {
     }
 
     @Test
-    public void MTRA_090201_getTransfersBySenderId_whenAccountDoesNotExist_ThenExceptionIsThrown() {
+    public void MTRA_080201_getTransfersByReceiverId_whenAccountDoesNotExist_ThenExceptionIsThrown() {
         //prepare data
-        String accountFromId = ID_NON_EXIST;
+        String accountToId = ID_NON_EXIST;
 
         //test
-        JsonPath actual = get("/accounts/transfers/accountFromId/" + accountFromId).then()
+        JsonPath actual = get("/accounts/transfers/accountToId/" + accountToId).then()
                 .assertThat()
                 .statusCode(HttpStatus.NOT_FOUND_404).
                         extract().jsonPath();
@@ -44,13 +44,13 @@ public class TransfersGetBySenderIdNegativeTest {
     }
 
     @Test
-    public void MTRA_090202_getTransfersBySenderId_whenNoTransfersForAccountFrom_ThenExceptionIsThrown() {
+    public void MTRA_080202_getTransfersByReceiverId_whenNoTransfersForAccountTo_ThenExceptionIsThrown() {
         //prepare data
         createUser(USER_NAME1, PASSPORT_ID1);
         String accountId = createAccountWithMoney(PASSPORT_ID1, MONEY_VALUE);
 
         //test
-        JsonPath actual = get("/accounts/transfers/accountFromId/" + accountId).then()
+        JsonPath actual = get("/accounts/transfers/accountToId/" + accountId).then()
                 .assertThat()
                 .statusCode(HttpStatus.NOT_FOUND_404).
                         extract().jsonPath();

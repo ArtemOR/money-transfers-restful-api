@@ -1,5 +1,6 @@
 package api.rest.negative;
 
+import api.rest.TestPayloadBuilder;
 import api.rest.MoneyTransferRest;
 import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
@@ -29,10 +30,11 @@ public class CreateAccountNegativeTest {
 
     @Test
     public void MTRA_020201_createAccount_whenAccountCreatesWithoutMandatoryParam_thenExceptionThrows() {
+        //prepare data
+        String payload = new TestPayloadBuilder().setAmount(MONEY_VALUE).buildPayload();
+
         //test
-        JsonPath createResult = given().body("{\n" +
-                "\"moneyBalance\": " + MONEY_VALUE + " \n" +
-                "}").
+        JsonPath createResult = given().body(payload).
                 when().post("/accounts").then().
                 assertThat().statusCode(HttpStatus.BAD_REQUEST_400).extract().jsonPath();
 
@@ -43,11 +45,11 @@ public class CreateAccountNegativeTest {
 
     @Test
     public void MTRA_020202_createAccount_whenAccountCreatesWithNonexistentPassportId_thenExceptionThrows() {
+        //prepare data
+        String payload = new TestPayloadBuilder().setPassportId(PASSPORT_ID_NON_EXIST).setAmount(MONEY_VALUE).buildPayload();
+
         //test
-        JsonPath createResult = given().body("{\n" +
-                "\"passportId\": " + PASSPORT_ID_NON_EXIST + ",\n" +
-                "\"moneyBalance\": " + MONEY_VALUE + " \n" +
-                "}").
+        JsonPath createResult = given().body(payload).
                 when().post("/accounts").then().
                 assertThat().statusCode(HttpStatus.NOT_FOUND_404).
                 extract().jsonPath();
@@ -61,12 +63,10 @@ public class CreateAccountNegativeTest {
     public void MTRA_020203_createAccount_whenAccountCreatesWithInvalidMoneyValue_thenExceptionThrows() {
         //prepare data
         createUser(USER_NAME1, PASSPORT_ID1);
+        String payload = new TestPayloadBuilder().setPassportId(PASSPORT_ID1).setMoneyBalance(INVALID_MONEY_VALUE).buildPayload();
 
         //test
-        JsonPath createResult = given().body("{\n" +
-                "\"passportId\": " + PASSPORT_ID1 + ",\n" +
-                "\"moneyBalance\": " + INVALID_MONEY_VALUE + " \n" +
-                "}").
+        JsonPath createResult = given().body(payload).
                 when().post("/accounts").then().
                 assertThat().statusCode(HttpStatus.BAD_REQUEST_400).
                 extract().jsonPath();

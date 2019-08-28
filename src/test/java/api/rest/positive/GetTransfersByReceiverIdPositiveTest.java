@@ -9,13 +9,15 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import static api.rest.TestConstants.*;
 import static api.rest.TestHelper.*;
 import static io.restassured.RestAssured.get;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class TransfersGetAllPositiveTest {
+public class GetTransfersByReceiverIdPositiveTest {
     @BeforeClass
     public static void init() {
         MoneyTransferRest.start();
@@ -29,26 +31,33 @@ public class TransfersGetAllPositiveTest {
     }
 
     @Test
-    public void MTRA_070101_getAllTransfers_whenMethodIsCalls_thenTransfersReturn() {
+    public void MTRA_080101_getTransfersByReceiverId_whenMethodIsCalls_thenTransfersReturn() {
         //prepare data
         createUser(USER_NAME1, PASSPORT_ID1);
         createUser(USER_NAME2, PASSPORT_ID2);
         String accountFromId = createAccountWithMoney(PASSPORT_ID1, MONEY_VALUE);
         String accountToId = createEmptyAccount(PASSPORT_ID2);
-        String transferId = transferMoneyBetweenAccounts(accountFromId, accountToId, SMALL_MONEY_VALUE);
+        String firstTransferId = transferMoneyBetweenAccounts(accountFromId, accountToId, SMALL_MONEY_VALUE);
+        String secondTransferId = transferMoneyBetweenAccounts(accountFromId, accountToId, SMALL_MONEY_VALUE);
 
         //test
-        JsonPath readResult = get("/accounts/transfers/getAll").then()
+        JsonPath readResult = get("/accounts/transfers/accountToId/"+accountToId).then()
                 .assertThat()
                 .statusCode(HttpStatus.OK_200).
                         extract().jsonPath();
 
         //verify
         ArrayList transfers = (ArrayList) readResult.getList("");
-        assertTrue(transfers.size() >= 1);
+        assertTrue(transfers.size() >= 2);
+        for(Object transfer:transfers){
+            assertEquals(((HashMap)transfer).get(ACCOUNT_TO_ID_PARAM).toString(), accountToId);
+            assertEquals(((HashMap)transfer).get(ACCOUNT_FROM_ID_PARAM).toString(), accountFromId);
+            assertEquals(((HashMap)transfer).get(AMOUNT_PARAM).toString(), SMALL_MONEY_VALUE);
+        }
 
         //cleanup
-        cleanTransfer(transferId);
+        cleanTransfer(firstTransferId);
+        cleanTransfer(secondTransferId);
         cleanUser(PASSPORT_ID1);
         cleanUser(PASSPORT_ID2);
     }

@@ -12,7 +12,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\":\"testUser\",\n\t\"passportId\":\"11\"\n}"
+					"raw": "{\r\n    \"name\": \"John\",\r\n    \"passportId\": \"1111\"\r\n}"
 				},
 				"url": {
 					"raw": "localhost:8082/users",
@@ -34,7 +34,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "\n {\n\n        \"passportId\": \"11\",\n        \"moneyBalance\": 1000,\n        \"creditLimit\": 10000\n   \n}"
+					"raw": "\n {\n\t\"passportId\": \"11\",\n    \"moneyBalance\": 1000,\n    \"creditLimit\": 10000\n   \n}"
 				},
 				"url": {
 					"raw": "localhost:8082/accounts",
@@ -163,7 +163,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"accountFromId\": 11,\r\n    \"accountToId\": 12,\r\n    \"amount\": 100.10\r\n   \r\n}"
+					"raw": ""
 				},
 				"url": {
 					"raw": "localhost:8082/account/transfers",
@@ -221,7 +221,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"accountFromId\": 11,\r\n    \"accountToId\": 12,\r\n    \"amount\": 100.10\r\n   \r\n}"
+					"raw": ""
 				},
 				"url": {
 					"raw": "localhost:8082/account/transfers?accountFromId=111",
@@ -273,7 +273,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"accountFromId\": 11,\r\n    \"accountToId\": 13,\r\n    \"amount\": 10000000\r\n}"
+					"raw": "{\r\n    \"accountFromId\": 12,\r\n    \"accountToId\": 13,\r\n    \"amount\": \"100\"\r\n    \r\n}"
 				},
 				"url": {
 					"raw": "localhost:8082/accounts/transfer",
@@ -314,6 +314,29 @@
 		},
 		{
 			"name": "localhost:8082/accounts/{id}",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:8082/accounts/13",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"accounts",
+						"13"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8082/accounts/transfers/{id}",
 			"request": {
 				"method": "DELETE",
 				"header": [],

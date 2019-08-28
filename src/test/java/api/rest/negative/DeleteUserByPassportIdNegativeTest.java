@@ -9,10 +9,11 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static api.rest.TestConstants.*;
+import static io.restassured.RestAssured.delete;
 import static io.restassured.RestAssured.get;
 import static org.junit.Assert.assertTrue;
 
-public class GetAccountByAccountIdNegativeTest {
+public class DeleteUserByPassportIdNegativeTest {
     @BeforeClass
     public static void init() {
         MoneyTransferRest.start();
@@ -26,15 +27,16 @@ public class GetAccountByAccountIdNegativeTest {
     }
 
     @Test
-    public void MTRA_060201_getAccount_whenAccountIdDoesNotExist_ThenExceptionIsThrown() {
+    public void MTRA_120201_deleteUser_whenPassportIdDoesNotExist_ThenExceptionIsThrown() {
         //test
-        JsonPath readResult = get("/accounts/" + ID_NON_EXIST).then()
+        JsonPath readResult = delete("/users/" + PASSPORT_ID_NON_EXIST).then()
                 .assertThat()
                 .statusCode(HttpStatus.NOT_FOUND_404).
                         extract().jsonPath();
 
         //verify
         String actualException = readResult.getString(DETAIL_MESSAGE_REQUEST_PARAM);
-        assertTrue(actualException.contains(ACCOUNT_NOT_FOUND_EXCEPTION));
+        assertTrue(actualException.contains(USER_NOT_FOUND_EXCEPTION));
+
     }
 }
