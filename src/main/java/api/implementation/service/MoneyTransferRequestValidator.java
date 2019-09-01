@@ -4,9 +4,8 @@ import api.implementation.exception.ExceptionList;
 import api.implementation.exception.MoneyTransferException;
 import api.implementation.model.Account;
 import api.implementation.model.AccountTransfer;
-import api.implementation.model.request.AccountRequest;
-import api.implementation.model.request.TransferRequest;
-import api.implementation.model.request.UserRequest;
+import api.implementation.model.request.*;
+import spark.utils.CollectionUtils;
 
 import java.util.List;
 import java.util.Objects;
@@ -128,4 +127,17 @@ public class MoneyTransferRequestValidator {
         }
     }
 
+    static List<String> validateMultiRead(WhereRequest request){
+        IdListRequest idListRequest = request.getWhere();
+        assertObjectNotNull(idListRequest);
+        assertIdListNotEmpty(idListRequest.getIds());
+
+        return request.getWhere().getIds();
+    }
+
+    private static void assertIdListNotEmpty(List list) {
+        if (CollectionUtils.isEmpty(list)) {
+            throw new MoneyTransferException(ExceptionList.ID_LIST_IS_EMPTY);
+        }
+    }
 }

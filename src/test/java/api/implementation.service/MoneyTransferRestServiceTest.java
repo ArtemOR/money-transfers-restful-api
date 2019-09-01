@@ -2,13 +2,12 @@ package api.implementation.service;
 
 import api.implementation.exception.ExceptionList;
 import api.implementation.exception.MoneyTransferException;
+import api.implementation.exception.MoneyTransferExceptionDetailResult;
 import api.implementation.model.Account;
 import api.implementation.model.AccountTransfer;
 import api.implementation.model.AccountType;
 import api.implementation.model.User;
-import api.implementation.model.request.AccountRequest;
-import api.implementation.model.request.TransferRequest;
-import api.implementation.model.request.UserRequest;
+import api.implementation.model.request.*;
 import api.implementation.model.transfer.BetweenAccountsTransfer;
 import api.implementation.model.transfer.InsideAccountTransfer;
 import com.google.gson.Gson;
@@ -28,6 +27,7 @@ import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import static api.implementation.exception.ExceptionList.*;
 import static api.implementation.service.MoneyTransferModelConverter.*;
@@ -62,6 +62,7 @@ public class MoneyTransferRestServiceTest {
         UserRequest userRequest = new UserRequest("name", "passprtId");
         String requestBody = gson.toJson(userRequest);
         when(request.body()).thenReturn(requestBody);
+        MoneyTransferRestService.users = new HashMap<>();
 
         String responseString = MoneyTransferRestService.createUser(request, response);
 
@@ -135,6 +136,7 @@ public class MoneyTransferRestServiceTest {
         HashMap<String, User> userHashMap = new HashMap<>();
         userHashMap.put("passId", new User());
         MoneyTransferRestService.users = userHashMap;
+        MoneyTransferRestService.accounts = new ConcurrentHashMap<>();
 
         String responseString = MoneyTransferRestService.createAccount(request, response);
 
@@ -164,6 +166,7 @@ public class MoneyTransferRestServiceTest {
         HashMap<String, User> userHashMap = new HashMap<>();
         userHashMap.put("passId", new User());
         MoneyTransferRestService.users = userHashMap;
+        MoneyTransferRestService.accounts = new ConcurrentHashMap<>();
 
         String responseString = MoneyTransferRestService.createAccount(request, response);
 
@@ -190,6 +193,7 @@ public class MoneyTransferRestServiceTest {
         accountRequest.setCreditLimit("1000");
         String requestBody = gson.toJson(accountRequest);
         when(request.body()).thenReturn(requestBody);
+        MoneyTransferRestService.accounts = new ConcurrentHashMap<>();
 
         try {
             String responseString = MoneyTransferRestService.createAccount(request, response);
@@ -218,6 +222,7 @@ public class MoneyTransferRestServiceTest {
         HashMap<String, User> userHashMap = new HashMap<>();
         userHashMap.put("passId", new User());
         MoneyTransferRestService.users = userHashMap;
+        MoneyTransferRestService.accounts = new ConcurrentHashMap<>();
 
         try {
             String responseString = MoneyTransferRestService.createAccount(request, response);
@@ -237,7 +242,7 @@ public class MoneyTransferRestServiceTest {
     }
 
     @Test
-    public void createAccount_whenNotSpecifyPassportId_thenExceptionIsThrows() {
+    public void createAccount_whenNotSpecifiedPassportId_thenExceptionIsThrows() {
         AccountRequest accountRequest = new AccountRequest();
         accountRequest.setMoneyBalance("1000");
         String requestBody = gson.toJson(accountRequest);
@@ -245,6 +250,7 @@ public class MoneyTransferRestServiceTest {
         HashMap<String, User> userHashMap = new HashMap<>();
         userHashMap.put("passId", new User());
         MoneyTransferRestService.users = userHashMap;
+        MoneyTransferRestService.accounts = new ConcurrentHashMap<>();
 
         try {
             String responseString = MoneyTransferRestService.createAccount(request, response);
@@ -287,9 +293,7 @@ public class MoneyTransferRestServiceTest {
         String name = "name1";
         when(request.params(PASSPORT_ID_PARAM)).thenReturn(passportId);
         HashMap<String, User> userHashMap = new HashMap<>();
-        User expected = new User();
-        expected.setPassportId(passportId);
-        expected.setName(name);
+        User expected = createUser(name, passportId);
         userHashMap.put(expected.getPassportId(), expected);
         MoneyTransferRestService.users = userHashMap;
 
@@ -305,12 +309,8 @@ public class MoneyTransferRestServiceTest {
 
     @Test
     public void getAllUsers_whenMethodCalls_thenUsersReturns() {
-        User user1 = new User();
-        user1.setPassportId("passp1");
-        user1.setName("name1");
-        User user2 = new User();
-        user2.setPassportId("passp2");
-        user2.setName("name2");
+        User user1 = createUser("name1", "passp1");
+        User user2 = createUser("name2", "passp2");
         HashMap<String, User> userHashMap = new HashMap<>();
         userHashMap.put(user1.getPassportId(), user1);
         userHashMap.put(user2.getPassportId(), user2);
@@ -520,9 +520,8 @@ public class MoneyTransferRestServiceTest {
         String name = "name1";
         when(request.params(PASSPORT_ID_PARAM)).thenReturn(passportId);
         HashMap<String, User> userHashMap = new HashMap<>();
-        User forDelete = new User();
-        forDelete.setPassportId(passportId);
-        forDelete.setName(name);
+
+        User forDelete = createUser(name, passportId);
         userHashMap.put(forDelete.getPassportId(), forDelete);
         MoneyTransferRestService.users = userHashMap;
 
@@ -608,6 +607,135 @@ public class MoneyTransferRestServiceTest {
         assertFalse(MoneyTransferRestService.users.isEmpty());
         assertFalse(MoneyTransferRestService.transfers.isEmpty());
         assertFalse(MoneyTransferRestService.accounts.isEmpty());
+    }
+
+    @Test
+    public void multiReadUsers_whenAllUserExist_thenAllUsersInResponse() {
+        String passportId1 = "passportId1";
+        String name1 = "name1";
+        String passportId2 = "passportId2";
+        String name2 = "name2";
+
+        List<String> ids = Arrays.asList(passportId1, passportId2);
+        WhereRequest whereRequest = new WhereRequest(new IdListRequest(ids));
+        when(request.body()).thenReturn(gson.toJson(whereRequest));
+
+        User expected1 = createUser(name1, passportId1);
+        User expected2 = createUser(name2, passportId2);
+
+        HashMap<String, User> expectedHashMap = new HashMap<>();
+        expectedHashMap.put(expected2.getPassportId(), expected2);
+        expectedHashMap.put(expected1.getPassportId(), expected1);
+        MoneyTransferRestService.users = expectedHashMap;
+
+        String responseString = MoneyTransferRestService.multiReadUsers(request, response);
+
+        Type itemsListType = new TypeToken<List<User>>() {
+        }.getType();
+        ArrayList<User> actual = gson.fromJson(responseString, itemsListType);
+        PowerMockito.verifyStatic(MoneyTransferRequestValidator.class);
+        validateMultiRead(whereRequest);
+        assertNotNull(actual);
+        assertEquals(ids.size(), actual.size());
+    }
+
+    @Test
+    public void multiReadUsers_whenPartOfUsersExist_thenPartOfUsersInResponse() {
+        String passportId1 = "passportId1";
+        String name1 = "name1";
+        String passportId2 = "passportId2";
+
+        List<String> ids = Arrays.asList(passportId1, passportId2);
+        WhereRequest whereRequest = new WhereRequest(new IdListRequest(ids));
+        when(request.body()).thenReturn(gson.toJson(whereRequest));
+
+        HashMap<String, User> expectedHashMap = new HashMap<>();
+        User expected1 = createUser(name1, passportId1);
+        expectedHashMap.put(expected1.getPassportId(), expected1);
+        MoneyTransferRestService.users = expectedHashMap;
+
+        try {
+            String responseString = MoneyTransferRestService.multiReadUsers(request, response);
+            fail();
+        } catch (Exception e) {
+            assertEquals(e.getClass(), MoneyTransferException.class);
+            assertTrue(e.getMessage().contains(PARTIAL_RESULT.message));
+            assertEquals(ids.size(), ((MoneyTransferException) e).getResults().size());
+            List successResult = ((MoneyTransferException) e).getResults().stream().filter(res -> res.getSuccess() != null).map(MoneyTransferExceptionDetailResult::getSuccess).collect(Collectors.toList());
+            assertEquals(expectedHashMap.size(), successResult.size());
+            successResult.forEach(result -> assertTrue(expectedHashMap.containsValue(result)));
+        }
+    }
+
+    @Test
+    public void multiReaAccounts_whenAllAccountsExist_thenAllAccountsInResponse() {
+        Long id1 = 1L;
+        Long id2 = 2L;
+        Account account1 = new Account(id1, "userid1", BigDecimal.ZERO, AccountType.CREDIT, BigDecimal.TEN);
+        Account account2 = new Account(id2, "userid1", BigDecimal.TEN, AccountType.DEBIT, BigDecimal.ZERO);
+
+        List<String> ids = Arrays.asList(String.valueOf(id1), String.valueOf(id2));
+        WhereRequest whereRequest = new WhereRequest(new IdListRequest(ids));
+        when(request.body()).thenReturn(gson.toJson(whereRequest));
+
+        Map<Long, Account> accountsMap = new ConcurrentHashMap<>();
+        accountsMap.put(account1.getId(), account1);
+        accountsMap.put(account2.getId(), account2);
+        MoneyTransferRestService.accounts = accountsMap;
+
+        String responseString = MoneyTransferRestService.multiReadAccounts(request, response);
+
+        Type itemsListType = new TypeToken<List<User>>() {
+        }.getType();
+        ArrayList<Account> actual = gson.fromJson(responseString, itemsListType);
+        PowerMockito.verifyStatic(MoneyTransferRequestValidator.class);
+        validateMultiRead(whereRequest);
+        assertNotNull(actual);
+        assertEquals(ids.size(), actual.size());
+    }
+
+    @Test
+    public void multiReaAccounts_whenAllAccountsNotExist_thenAllAccountsInResponse() {
+        String id1 = "1";
+        String id2 = "2";
+
+        List<String> ids = Arrays.asList(id1, id2);
+        WhereRequest whereRequest = new WhereRequest(new IdListRequest(ids));
+        when(request.body()).thenReturn(gson.toJson(whereRequest));
+        MoneyTransferRestService.accounts = new ConcurrentHashMap<>();
+
+        try {
+            String responseString = MoneyTransferRestService.multiReadUsers(request, response);
+            fail();
+        } catch (Exception e) {
+            assertEquals(e.getClass(), MoneyTransferException.class);
+            assertTrue(e.getMessage().contains(ALL_FAILED.message));
+            assertEquals(ids.size(), ((MoneyTransferException) e).getResults().size());
+        }
+    }
+
+    @Test
+    public void multiReaAccounts_whenEmptyIdList_thenExceptionIsThrows() {
+
+        List<String> ids = new ArrayList<>();
+        WhereRequest whereRequest = new WhereRequest(new IdListRequest(ids));
+        when(request.body()).thenReturn(gson.toJson(whereRequest));
+
+        try {
+            String responseString = MoneyTransferRestService.multiReadUsers(request, response);
+            fail();
+        } catch (Exception e) {
+            assertEquals(e.getClass(), MoneyTransferException.class);
+            assertTrue(e.getMessage().contains(ID_LIST_IS_EMPTY.message));
+        }
+    }
+
+    private User createUser(String name, String passportId) {
+        User user = new User();
+        user.setPassportId(passportId);
+        user.setName(name);
+
+        return user;
     }
 
 }

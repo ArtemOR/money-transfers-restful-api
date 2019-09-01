@@ -2,10 +2,12 @@ package api.implementation.service;
 
 import api.implementation.exception.ExceptionList;
 import api.implementation.exception.MoneyTransferException;
+import api.implementation.exception.MoneyTransferExceptionDetailResult;
 import api.implementation.model.*;
 import api.implementation.model.request.AccountRequest;
 import api.implementation.model.request.TransferRequest;
 import api.implementation.model.request.UserRequest;
+import api.implementation.model.request.WhereRequest;
 import api.implementation.model.transfer.BetweenAccountsTransfer;
 import api.implementation.model.transfer.InsideAccountTransfer;
 import com.google.gson.Gson;
@@ -14,13 +16,13 @@ import spark.Request;
 import spark.Response;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static api.implementation.exception.ExceptionList.ALL_FAILED;
+import static api.implementation.exception.ExceptionList.PARTIAL_RESULT;
 import static api.implementation.service.MoneyTransferModelConverter.*;
 import static api.implementation.service.MoneyTransferRequestValidator.*;
 import static api.implementation.service.StringConstants.*;
@@ -220,6 +222,58 @@ public class MoneyTransferRestService {
         return gson.toJson(transfers.get(transferId));
     }
 
+    public static String multiReadUsers(Request request, Response response) {
+        response.type(CONTENT_TYPE);
+
+        String requestBody = request.body();
+        WhereRequest whereRequest = gson.fromJson(requestBody, WhereRequest.class);
+
+        assertObjectNotNull(whereRequest);
+        List<String> idsList = validateMultiRead(whereRequest);
+
+        ArrayList<Object> successResult = new ArrayList<>();
+        ArrayList<MoneyTransferExceptionDetailResult<?>> errorResult = new ArrayList<>();
+
+        Function<String, Object> function = (String passportId) -> {
+            assertUserExist(passportId);
+            return users.get(passportId);
+        };
+
+        idsList.forEach(passportId -> performFunction(function, passportId, successResult, errorResult));
+        handlePartialResult(idsList.size(), successResult.size(), errorResult);
+
+        response.body(gson.toJson(successResult));
+
+        response.status(HttpStatus.OK_200);
+        return response.body();
+    }
+
+    public static String multiReadAccounts(Request request, Response response) {
+        response.type(CONTENT_TYPE);
+
+        String requestBody = request.body();
+        WhereRequest whereRequest = gson.fromJson(requestBody, WhereRequest.class);
+
+        assertObjectNotNull(whereRequest);
+        List<String> idsList = validateMultiRead(whereRequest);
+
+        ArrayList<Object> successResult = new ArrayList<>();
+        ArrayList<MoneyTransferExceptionDetailResult<?>> errorResult = new ArrayList<>();
+
+        Function<String, Object> function = (String accountId) -> {
+            assertAccountExist(Long.valueOf(accountId));
+            return accounts.get(Long.valueOf(accountId));
+        };
+
+        idsList.forEach(accountId -> performFunction(function, accountId, successResult, errorResult));
+        handlePartialResult(idsList.size(), successResult.size(), errorResult);
+
+        response.body(gson.toJson(successResult));
+
+        response.status(HttpStatus.OK_200);
+        return response.body();
+    }
+
     public static void generateException(MoneyTransferException moneyTransferException, Request request, Response response) {
         response.status(moneyTransferException.getHttpResponseCode());
         response.type(CONTENT_TYPE);
@@ -257,6 +311,30 @@ public class MoneyTransferRestService {
 
         BetweenAccountsTransfer transfer = new BetweenAccountsTransfer(55L, 11L, 12L, new BigDecimal(500), System.currentTimeMillis());
         transfers.put(transfer.getId(), transfer);
+    }
+
+    private static void performFunction(Function<String, Object> function, String id,
+                                ArrayList<Object> result, List<MoneyTransferExceptionDetailResult<?>> errorResult) {
+        try {
+            Object response = function.apply(id);
+            result.add(response);
+            errorResult.add(new MoneyTransferExceptionDetailResult<>(response));
+        } catch (MoneyTransferException mte) {
+            errorResult.add(new MoneyTransferExceptionDetailResult<>(mte));
+        }
+    }
+
+    private static void handlePartialResult(int inputSize, int resultSize, List<MoneyTransferExceptionDetailResult<?>> exceptionResult) {
+        if (resultSize == 0) {
+            MoneyTransferException allFailed = new MoneyTransferException(ALL_FAILED);
+            allFailed.setResults(exceptionResult);
+            throw allFailed;
+        }
+        if (resultSize < inputSize) {
+            MoneyTransferException partialResult = new MoneyTransferException(PARTIAL_RESULT);
+            partialResult.setResults(exceptionResult);
+            throw partialResult;
+        }
     }
 
 }

@@ -56,6 +56,10 @@ public class MoneyTransferRest {
 
         delete("/accounts/transfers/:transferId", MoneyTransferRestService::deleteTransferByTransferId);
 
+        post("/users/multi-read", MoneyTransferRestService::multiReadUsers);
+
+        post("/accounts/multi-read", MoneyTransferRestService::multiReadAccounts);
+
         exception(MoneyTransferException.class, MoneyTransferRestService::generateException);
 
         exception(NumberFormatException.class, MoneyTransferRestService::generateException);

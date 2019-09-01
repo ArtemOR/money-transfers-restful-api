@@ -1,9 +1,12 @@
 package api.implementation.exception;
 
+import java.util.List;
+
 public class MoneyTransferException extends RuntimeException {
 
     private String errorCode;
     private transient int httpResponseCode;
+    private List<MoneyTransferExceptionDetailResult<?>> results;
 
     public MoneyTransferException(String errorCode, String message) {
         super(message, null, false, false);
@@ -28,6 +31,14 @@ public class MoneyTransferException extends RuntimeException {
 
     public String getErrorCode() {
         return errorCode;
+    }
+
+    public List<MoneyTransferExceptionDetailResult<?>> getResults() {
+        return results;
+    }
+
+    public void setResults(List<MoneyTransferExceptionDetailResult<?>> results) {
+        this.results = results;
     }
 
     @Override

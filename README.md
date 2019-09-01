@@ -476,3 +476,163 @@ Error Responses:
 			"errorCode": "id6",
 			"detailMessage": "Transfer with provided transferId does not exist: transferId=555"
 		  }
+
+# 5 Multi-Read operations
+
+## 5.1 Retrieve users by id list
+- Description: retrieves users from system by provided id list
+- URL: /users/multi-read
+- Method: POST
+- Return: List of users
+- Sample Call:
+
+	PUT http://localhost:8082/users/multi-read
+	Body: {
+			"where": {
+			            ids:[111, 222]
+			        }
+		   }
+
+Success Response:
+
+	HTTP Code: 200
+	Body: [
+              {
+                  "id": 1,
+                  "name": "John",
+                  "passportId": "111"
+              },
+              {
+                  "id": 2,
+                  "name": "Mike",
+                  "passportId": "222"
+              }
+          ]
+
+
+Error Responses:
+
+	HTTP Code: 404
+	Body: {
+              "errorCode": "id14",
+              "results": [
+                  {
+                      "error": {
+                          "errorCode": "id5",
+                          "detailMessage": "User with provided passportId does not exist: passportId=1"
+                      }
+                  },
+                  {
+                      "error": {
+                          "errorCode": "id5",
+                          "detailMessage": "User with provided passportId does not exist: passportId=2"
+                      }
+                  }
+              ],
+              "detailMessage": "No records found"
+          }
+
+Partial result:
+
+HTTP Code: 207
+{
+    "errorCode": "id13",
+    "results": [
+        {
+            "success": {
+                "id": 1,
+                "name": "John",
+                "passportId": "111"
+            }
+        },
+        {
+            "error": {
+                "errorCode": "id5",
+                "detailMessage": "User with provided passportId does not exist: passportId=54321"
+            }
+        }
+    ],
+    "detailMessage": "Some records not found"
+}
+
+## 5.2 Retrieve accounts by id list
+- Description: retrieves accounts from system by provided id list
+- URL: /accounts/multi-read
+- Method: POST
+- Return: List of accounts
+- Sample Call:
+
+	PUT http://localhost:8082/accounts/multi-read
+	Body: {
+			"where": {
+			            ids:[11, 12]
+			        }
+		   }
+
+Success Response:
+
+	HTTP Code: 200
+	Body: [
+              {
+                  "id": 11,
+                  "passportId": "111",
+                  "moneyBalance": 1000,
+                  "accountType": "DEBIT",
+                  "creditLimit": 0
+              },
+              {
+                  "id": 12,
+                  "passportId": "111",
+                  "moneyBalance": 0,
+                  "accountType": "CREDIT",
+                  "creditLimit": 1000
+              }
+          ]
+
+
+Error Responses:
+
+	HTTP Code: 404
+	Body: {
+              "errorCode": "id14",
+              "results": [
+                  {
+                      "error": {
+                          "errorCode": "id7",
+                          "detailMessage": "Account with provided accountId does not exist: accountId=1"
+                      }
+                  },
+                  {
+                      "error": {
+                          "errorCode": "id7",
+                          "detailMessage": "Account with provided accountId does not exist: accountId=2"
+                      }
+                  }
+              ],
+              "detailMessage": "No records found"
+          }
+
+Partial result:
+
+HTTP Code: 207
+{
+    "errorCode": "id13",
+    "results": [
+        {
+            "success": {
+                "id": 11,
+                "passportId": "111",
+                "moneyBalance": 1000,
+                "accountType": "DEBIT",
+                "creditLimit": 0
+            }
+        },
+        {
+            "error": {
+                "errorCode": "id7",
+                "detailMessage": "Account with provided accountId does not exist: accountId=12345"
+            }
+        }
+    ],
+    "detailMessage": "Some records not found"
+}

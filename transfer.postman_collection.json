@@ -351,6 +351,52 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "localhost:8082/users/multi-read",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"where\": {\n\t\t\t\tids:[111,222,333]\n\t\t\t }\n}"
+				},
+				"url": {
+					"raw": "localhost:8082/users/multi-read",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"users",
+						"multi-read"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8082/accounts/multi-read",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"where\": {\n\t\t\t\t\"ids\":[11, 12, 111111]\n\t\t\t }\n}"
+				},
+				"url": {
+					"raw": "localhost:8082/accounts/multi-read",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"accounts",
+						"multi-read"
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }
