@@ -62,6 +62,7 @@ public class MoneyTransferRestServiceTest {
         UserRequest userRequest = new UserRequest("name", "passprtId");
         String requestBody = gson.toJson(userRequest);
         when(request.body()).thenReturn(requestBody);
+        MoneyTransferRestService.users = new HashMap<>();
 
         String responseString = MoneyTransferRestService.createUser(request, response);
 
@@ -135,6 +136,7 @@ public class MoneyTransferRestServiceTest {
         HashMap<String, User> userHashMap = new HashMap<>();
         userHashMap.put("passId", new User());
         MoneyTransferRestService.users = userHashMap;
+        MoneyTransferRestService.accounts = new ConcurrentHashMap<>();
 
         String responseString = MoneyTransferRestService.createAccount(request, response);
 
@@ -164,6 +166,7 @@ public class MoneyTransferRestServiceTest {
         HashMap<String, User> userHashMap = new HashMap<>();
         userHashMap.put("passId", new User());
         MoneyTransferRestService.users = userHashMap;
+        MoneyTransferRestService.accounts = new ConcurrentHashMap<>();
 
         String responseString = MoneyTransferRestService.createAccount(request, response);
 
@@ -190,6 +193,7 @@ public class MoneyTransferRestServiceTest {
         accountRequest.setCreditLimit("1000");
         String requestBody = gson.toJson(accountRequest);
         when(request.body()).thenReturn(requestBody);
+        MoneyTransferRestService.accounts = new ConcurrentHashMap<>();
 
         try {
             String responseString = MoneyTransferRestService.createAccount(request, response);
@@ -218,6 +222,7 @@ public class MoneyTransferRestServiceTest {
         HashMap<String, User> userHashMap = new HashMap<>();
         userHashMap.put("passId", new User());
         MoneyTransferRestService.users = userHashMap;
+        MoneyTransferRestService.accounts = new ConcurrentHashMap<>();
 
         try {
             String responseString = MoneyTransferRestService.createAccount(request, response);
@@ -237,7 +242,7 @@ public class MoneyTransferRestServiceTest {
     }
 
     @Test
-    public void createAccount_whenNotSpecifyPassportId_thenExceptionIsThrows() {
+    public void createAccount_whenNotSpecifiedPassportId_thenExceptionIsThrows() {
         AccountRequest accountRequest = new AccountRequest();
         accountRequest.setMoneyBalance("1000");
         String requestBody = gson.toJson(accountRequest);
@@ -245,6 +250,7 @@ public class MoneyTransferRestServiceTest {
         HashMap<String, User> userHashMap = new HashMap<>();
         userHashMap.put("passId", new User());
         MoneyTransferRestService.users = userHashMap;
+        MoneyTransferRestService.accounts = new ConcurrentHashMap<>();
 
         try {
             String responseString = MoneyTransferRestService.createAccount(request, response);
@@ -287,9 +293,7 @@ public class MoneyTransferRestServiceTest {
         String name = "name1";
         when(request.params(PASSPORT_ID_PARAM)).thenReturn(passportId);
         HashMap<String, User> userHashMap = new HashMap<>();
-        User expected = new User();
-        expected.setPassportId(passportId);
-        expected.setName(name);
+        User expected = createUser(name, passportId);
         userHashMap.put(expected.getPassportId(), expected);
         MoneyTransferRestService.users = userHashMap;
 
@@ -305,12 +309,8 @@ public class MoneyTransferRestServiceTest {
 
     @Test
     public void getAllUsers_whenMethodCalls_thenUsersReturns() {
-        User user1 = new User();
-        user1.setPassportId("passp1");
-        user1.setName("name1");
-        User user2 = new User();
-        user2.setPassportId("passp2");
-        user2.setName("name2");
+        User user1 = createUser("name1", "passp1");
+        User user2 = createUser("name2", "passp2");
         HashMap<String, User> userHashMap = new HashMap<>();
         userHashMap.put(user1.getPassportId(), user1);
         userHashMap.put(user2.getPassportId(), user2);
@@ -520,9 +520,8 @@ public class MoneyTransferRestServiceTest {
         String name = "name1";
         when(request.params(PASSPORT_ID_PARAM)).thenReturn(passportId);
         HashMap<String, User> userHashMap = new HashMap<>();
-        User forDelete = new User();
-        forDelete.setPassportId(passportId);
-        forDelete.setName(name);
+
+        User forDelete = createUser(name, passportId);
         userHashMap.put(forDelete.getPassportId(), forDelete);
         MoneyTransferRestService.users = userHashMap;
 
@@ -599,15 +598,23 @@ public class MoneyTransferRestServiceTest {
 
     @Test
     public void createSomeTestObjects_whenMethodIsCalls_thenMapsNotEmpty() {
-        assertTrue(MoneyTransferRestService.users.isEmpty());
-        assertTrue(MoneyTransferRestService.transfers.isEmpty());
-        assertTrue(MoneyTransferRestService.accounts.isEmpty());
+        MoneyTransferRestService.users = new HashMap<>();
+        MoneyTransferRestService.accounts = new ConcurrentHashMap<>();
+        MoneyTransferRestService.transfers = new HashMap<>();
 
         MoneyTransferRestService.createSomeTestObjects();
 
         assertFalse(MoneyTransferRestService.users.isEmpty());
         assertFalse(MoneyTransferRestService.transfers.isEmpty());
         assertFalse(MoneyTransferRestService.accounts.isEmpty());
+    }
+
+    private User createUser(String name, String passportId) {
+        User user = new User();
+        user.setPassportId(passportId);
+        user.setName(name);
+
+        return user;
     }
 
 }
