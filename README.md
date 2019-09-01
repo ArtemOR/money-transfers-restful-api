@@ -12,7 +12,7 @@ Applications supports:
 -create users and accounts
 -put money to account, transfer money from one account to another
 -receive users, accounts and all transfer history
--delete users and accounts
+-delete users, accounts and transfers
 
 To run application:
 1. gradlew build
@@ -22,7 +22,8 @@ OR: run jar file from root directory
 
 Application uses port 8082
 
-- in root directory placed PostMan Collection with call samples "transfer.postman_collection"
+- root directory contains PostMan Collection with call samples "transfer.postman_collection"
+- root directory contains test plan for integration tests
 - in memory already created some test objects of users and accounts
 
 Methods description:
@@ -37,7 +38,6 @@ Methods description:
 - Return: 	User object
  
  Sample Call:
-
 
 	POST http://localhost:8082/users
 	Body: {
@@ -230,7 +230,7 @@ Error Response:
 			"detailMessage": "Account with provider accountId does not exist: accountId=121"
 		   }
 
-## 2.5.1 Retrieve all transfers
+## 2.5 Retrieve all transfers
 - Description: retrieves all transfers
 - URL: /account/transfers
 - Method: GET
@@ -251,7 +251,7 @@ Success Response:
 			},...
 		]
 
-## 2.5.2 Retrieve transfers by receiver id
+## 2.6 Retrieve transfers by receiver id
 - Description: retrieves all transfers sent to account by accountToId
 - URL: /account/transfers?accountToId={accountToId}
 - Method: GET
@@ -280,7 +280,7 @@ Error Response:
 			"message": "Transfers not found for account: accountId={accountToId}"
 		   }
 
-## 2.5.3 Retrieve transfers by sender id
+## 2.7 Retrieve transfers by sender id
 - Description: retrieves all transfers sent from account by accountFromId
 - URL: /account/transfers?accountFromId={accountFromId}
 - Method: GET
@@ -458,4 +458,21 @@ Error Responses:
 	Body: {
 			"errorCode": "id4",
 			"detailMessage": "Account with provider accountId does not exist: accountId=131"
+		  }
+
+## 4.3 Delete a transfer by transfer id
+- Description: delete a transfer from the system
+- URL: /accounts/transfers/{id}
+- Method: DELETE
+
+Sample Call: DELETE http://localhost:8082/accounts/transfers/55
+
+Success Response: HTTP Code: 204 Body: no Content
+
+Error Responses:
+
+	HTTP Code: 404
+	Body: {
+			"errorCode": "id6",
+			"detailMessage": "Transfer with provided transferId does not exist: transferId=555"
 		  }

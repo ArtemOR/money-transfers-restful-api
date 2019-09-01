@@ -34,7 +34,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "\n {\n\t\"passportId\": \"11\",\n    \"moneyBalance\": 1000,\n    \"creditLimit\": 10000\n   \n}"
+					"raw": "\n {\n\t\"passportId\": \"111\",\n    \"moneyBalance\": 1000,\n    \"creditLimit\": 10000\n   \n}"
 				},
 				"url": {
 					"raw": "localhost:8082/accounts",
@@ -154,7 +154,7 @@
 			"response": []
 		},
 		{
-			"name": "localhost:8082/account/transfers",
+			"name": "localhost:8082/accounts/transfers/getAll",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
 			},
@@ -166,21 +166,22 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "localhost:8082/account/transfers",
+					"raw": "localhost:8082/accounts/transfers/getAll",
 					"host": [
 						"localhost"
 					],
 					"port": "8082",
 					"path": [
-						"account",
-						"transfers"
+						"accounts",
+						"transfers",
+						"getAll"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "localhost:8082/account/transfers?accountToId={accountToId}",
+			"name": "localhost:8082/accounts/transfers/accountToId/:accountToId",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
 			},
@@ -192,27 +193,23 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "localhost:8082/account/transfers?accountToId=131",
+					"raw": "localhost:8082/accounts/transfers/accountToId/12",
 					"host": [
 						"localhost"
 					],
 					"port": "8082",
 					"path": [
-						"account",
-						"transfers"
-					],
-					"query": [
-						{
-							"key": "accountToId",
-							"value": "131"
-						}
+						"accounts",
+						"transfers",
+						"accountToId",
+						"12"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "localhost:8082/account/transfers?accountFromId={accountFromId}",
+			"name": "localhost:8082/accounts/transfers/accountFromId/:accountFromId",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
 			},
@@ -224,20 +221,16 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "localhost:8082/account/transfers?accountFromId=111",
+					"raw": "localhost:8082/accounts/transfers/accountFromId/11",
 					"host": [
 						"localhost"
 					],
 					"port": "8082",
 					"path": [
-						"account",
-						"transfers"
-					],
-					"query": [
-						{
-							"key": "accountFromId",
-							"value": "111"
-						}
+						"accounts",
+						"transfers",
+						"accountFromId",
+						"11"
 					]
 				}
 			},
@@ -345,14 +338,15 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "localhost:8082/accounts/13",
+					"raw": "localhost:8082/accounts/transfers/55",
 					"host": [
 						"localhost"
 					],
 					"port": "8082",
 					"path": [
 						"accounts",
-						"13"
+						"transfers",
+						"55"
 					]
 				}
 			},
