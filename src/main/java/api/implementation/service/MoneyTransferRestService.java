@@ -42,7 +42,7 @@ public class MoneyTransferRestService {
         //read the body of request
         String requestBody = request.body();
         UserRequest userRequest = gson.fromJson(requestBody, UserRequest.class);
-        assertNotNull(userRequest);
+        assertObjectNotNull(userRequest);
         validateUser(userRequest);
         User user = convertUserRequest(userRequest);
         users.put(user.getPassportId(), user);
@@ -59,7 +59,7 @@ public class MoneyTransferRestService {
         AccountRequest accountRequest = gson.fromJson(requestBody, AccountRequest.class);
 
         //check if it is possible to create an object from json
-        assertNotNull(accountRequest);
+        assertObjectNotNull(accountRequest);
         validateAccount(accountRequest);
         Account account = convertAccountRequest(accountRequest);
         accounts.put(account.getId(), account);
@@ -137,7 +137,7 @@ public class MoneyTransferRestService {
         String requestBody = request.body();
         TransferRequest transferRequest = gson.fromJson(requestBody, TransferRequest.class);
 
-        assertNotNull(transferRequest);
+        assertObjectNotNull(transferRequest);
         validateRecharging(transferRequest);
         InsideAccountTransfer transfer = convertTransferRequest(transferRequest);
 
@@ -158,7 +158,7 @@ public class MoneyTransferRestService {
         String requestBody = request.body();
         TransferRequest transferRequest = gson.fromJson(requestBody, TransferRequest.class);
 
-        assertNotNull(transferRequest);
+        assertObjectNotNull(transferRequest);
         validateTransferBetweenAccounts(transferRequest);
         BetweenAccountsTransfer betweenAccountsTransfer = convertBetweenAccountsTransferRequest(transferRequest);
 
@@ -243,7 +243,7 @@ public class MoneyTransferRestService {
         User john = new User(1L, "John", "111");
         users.put(john.getPassportId(), john);
 
-        User mike = new User(2L, "Fred", "222");
+        User mike = new User(2L, "Mike", "222");
         users.put(mike.getPassportId(), mike);
 
         Account johnsFirst = new Account(11L, "111", new BigDecimal(1000), AccountType.DEBIT, new BigDecimal(0));
@@ -254,6 +254,9 @@ public class MoneyTransferRestService {
 
         Account mikes = new Account(13L, "222", new BigDecimal(3000), AccountType.DEBIT, new BigDecimal(0));
         accounts.put(mikes.getId(), mikes);
+
+        BetweenAccountsTransfer transfer = new BetweenAccountsTransfer(55L, 11L, 12L, new BigDecimal(500), System.currentTimeMillis());
+        transfers.put(transfer.getId(), transfer);
     }
 
 }

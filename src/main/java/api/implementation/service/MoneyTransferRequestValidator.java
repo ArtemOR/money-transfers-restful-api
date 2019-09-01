@@ -18,21 +18,17 @@ import static api.implementation.service.StringConstants.*;
 
 public class MoneyTransferRequestValidator {
 
-    static void assertNotNull(Object object) {
+    static void assertObjectNotNull(Object object) {
         if (Objects.isNull(object)) {
-            throw new MoneyTransferException(ExceptionList.MISSING_MANDATORY_PARAMETERS, REQUEST);
+            throw new MoneyTransferException(ExceptionList.MISSING_REQUEST, REQUEST);
         }
     }
 
     static void validateUser(UserRequest userRequest) {
         //check for mandatory params
-        if (Objects.isNull(userRequest.getName())) {
-            throw new MoneyTransferException(ExceptionList.MISSING_MANDATORY_PARAMETERS, NAME_PARAM);
-        }
+        verifyMandatoryParam(userRequest.getName(), NAME_PARAM);
         String passportId = userRequest.getPassportId();
-        if (Objects.isNull(passportId)) {
-            throw new MoneyTransferException(ExceptionList.MISSING_MANDATORY_PARAMETERS, PASSPORT_ID_PARAM);
-        }
+        verifyMandatoryParam(passportId, PASSPORT_ID_PARAM);
         //check is this object already exist
         if (users.containsKey(passportId)) {
             throw new MoneyTransferException(ExceptionList.USER_ALREADY_EXIST, passportId);
@@ -42,72 +38,49 @@ public class MoneyTransferRequestValidator {
     static void validateAccount(AccountRequest accountRequest) {
         String passportId = accountRequest.getPassportId();
         //check for mandatory params
-        if (Objects.isNull(passportId)) {
-            throw new MoneyTransferException(ExceptionList.MISSING_MANDATORY_PARAMETERS, PASSPORT_ID_PARAM);
-        }
+        verifyMandatoryParam(passportId, PASSPORT_ID_PARAM);
         //check that user exist
-        if (!users.containsKey(passportId)) {
-            throw new MoneyTransferException(ExceptionList.USER_NOT_FOUND, passportId);
-        }
-
+        assertUserExist(passportId);
+        System.out.println();
         //check that creditLimit and money balance not negative
-        if (Objects.nonNull(accountRequest.getCreditLimit()) && Double.valueOf(accountRequest.getCreditLimit()) < 0) {
-            throw new MoneyTransferException(ExceptionList.MONEY_PARAMETER_SHOULD_CONTAIN_POSITIVE_VALUE, CREDIT_LIMIT_PARAM);
+        if (Objects.nonNull(accountRequest.getCreditLimit())) {
+            verifyMoneyPositiveParam(accountRequest.getCreditLimit(), CREDIT_LIMIT_PARAM);
         }
 
-        if (Objects.nonNull(accountRequest.getMoneyBalance()) && Double.valueOf(accountRequest.getMoneyBalance()) < 0)
-            throw new MoneyTransferException(ExceptionList.MONEY_PARAMETER_SHOULD_CONTAIN_POSITIVE_VALUE, MONEY_BALANCE_PARAM);
+        if (Objects.nonNull(accountRequest.getMoneyBalance())) {
+            verifyMoneyPositiveParam(accountRequest.getMoneyBalance(), MONEY_BALANCE_PARAM);
+        }
     }
 
     static void validateRecharging(TransferRequest transferRequest) {
         String accountId = transferRequest.getAccountToId();
         //check for mandatory params
-        if (Objects.isNull(accountId)) {
-            throw new MoneyTransferException(ExceptionList.MISSING_MANDATORY_PARAMETERS, ACCOUNT_ID_PARAM);
-        }
+        verifyMandatoryParam(accountId, ACCOUNT_ID_PARAM);
         //check if the object exist
-        if (!accounts.containsKey(Long.valueOf(accountId))) {
-            throw new MoneyTransferException(ExceptionList.ACCOUNT_NOT_FOUND, accountId);
-        }
+        assertAccountExist(Long.valueOf(accountId));
         //check that amount of money is positive
-        if (Objects.isNull(transferRequest.getAmount())) {
-            throw new MoneyTransferException(ExceptionList.MISSING_MANDATORY_PARAMETERS, AMOUNT_PARAM);
-        }
-
-        if (Double.valueOf(transferRequest.getAmount()) <= 0) {
-            throw new MoneyTransferException(ExceptionList.MONEY_PARAMETER_SHOULD_CONTAIN_POSITIVE_VALUE, AMOUNT_PARAM);
-        }
+        verifyMandatoryParam(transferRequest.getAmount(), AMOUNT_PARAM);
+        verifyMoneyPositiveParam(transferRequest.getAmount(), AMOUNT_PARAM);
     }
 
     static void validateTransferBetweenAccounts(TransferRequest transferRequest) {
 
         //check for mandatory parameters an that all accounts exist
         String accountFromId = transferRequest.getAccountFromId();
-        if (Objects.isNull(accountFromId)) {
-            throw new MoneyTransferException(ExceptionList.MISSING_MANDATORY_PARAMETERS, ACCOUNT_FROM_ID_PARAM);
-        }
+        verifyMandatoryParam(accountFromId, ACCOUNT_FROM_ID_PARAM);
         String accountToId = transferRequest.getAccountToId();
         if (accountFromId.equals(accountToId)) {
             throw new MoneyTransferException(ExceptionList.CHOSE_DIFFERENT_ACCOUNT_IDS);
         }
-        if (Objects.isNull(accountToId)) {
-            throw new MoneyTransferException(ExceptionList.MISSING_MANDATORY_PARAMETERS, ACCOUNT_TO_ID_PARAM);
-        }
-        if (!accounts.containsKey(Long.valueOf(accountToId))) {
-            throw new MoneyTransferException(ExceptionList.ACCOUNT_NOT_FOUND, accountToId);
-        }
-        if (!accounts.containsKey(Long.valueOf(accountFromId))) {
-            throw new MoneyTransferException(ExceptionList.ACCOUNT_NOT_FOUND, accountFromId);
-        }
-
+        verifyMandatoryParam(accountToId, ACCOUNT_TO_ID_PARAM);
+        assertAccountExist(Long.valueOf(accountToId));
+        assertAccountExist(Long.valueOf(accountFromId));
         String value = transferRequest.getAmount();
-        if (Objects.isNull(value)) {
-            throw new MoneyTransferException(ExceptionList.MISSING_MANDATORY_PARAMETERS, ACCOUNT_TO_ID_PARAM);
-        }
+        verifyMandatoryParam(value, AMOUNT_PARAM);
+
         //check that value is positive
-        if (Double.valueOf(value) < 0) {
-            throw new MoneyTransferException(ExceptionList.MONEY_PARAMETER_SHOULD_CONTAIN_POSITIVE_VALUE, AMOUNT_PARAM);
-        }
+        verifyMoneyPositiveParam(value, AMOUNT_PARAM);
+
         //check that there is enough money
         Account accountFrom = accounts.get(Long.valueOf(accountFromId));
         if ((accountFrom.getMoneyBalance().doubleValue() + accountFrom.getCreditLimit().doubleValue()) < Double.valueOf(value)) {
@@ -140,6 +113,18 @@ public class MoneyTransferRequestValidator {
         //check if account exist
         if (transfers.isEmpty()) {
             throw new MoneyTransferException(ExceptionList.TRANSFERS_NOT_FOUND, accountId);
+        }
+    }
+
+    private static void verifyMandatoryParam(String paramValue, String paramName){
+        if (Objects.isNull(paramValue)) {
+            throw new MoneyTransferException(ExceptionList.MISSING_MANDATORY_PARAMETERS, paramName);
+        }
+    }
+
+    private static void verifyMoneyPositiveParam(String value, String paramName){
+        if (Double.valueOf(value) < 0) {
+            throw new MoneyTransferException(ExceptionList.MONEY_PARAMETER_SHOULD_CONTAIN_POSITIVE_VALUE, paramName);
         }
     }
 
