@@ -1,4 +1,4 @@
-package api.implementation.service;
+package api.implementation.constants;
 
 public class StringConstants {
 

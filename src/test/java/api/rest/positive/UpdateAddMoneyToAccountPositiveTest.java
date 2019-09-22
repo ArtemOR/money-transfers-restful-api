@@ -1,11 +1,8 @@
 package api.rest.positive;
 
+import api.rest.MoneyTransferTest;
 import api.rest.TestPayloadBuilder;
-import api.rest.MoneyTransferRest;
-import io.restassured.RestAssured;
 import org.eclipse.jetty.http.HttpStatus;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static api.rest.TestConstants.*;
@@ -14,18 +11,7 @@ import static io.restassured.RestAssured.get;
 import static io.restassured.RestAssured.given;
 import static org.junit.Assert.assertEquals;
 
-public class UpdateAddMoneyToAccountPositiveTest {
-    @BeforeClass
-    public static void init() {
-        MoneyTransferRest.start();
-        RestAssured.baseURI = "http://localhost";
-        RestAssured.port = 8082;
-    }
-
-    @AfterClass
-    public static void stopServer() {
-        MoneyTransferRest.stop();
-    }
+public class UpdateAddMoneyToAccountPositiveTest extends MoneyTransferTest {
 
     @Test
     public void MTRA_100101_addMoney_whenParametersAreValid_thenOperationExecute() {

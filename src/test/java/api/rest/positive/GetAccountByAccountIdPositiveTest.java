@@ -1,11 +1,8 @@
 package api.rest.positive;
 
-import api.rest.MoneyTransferRest;
-import io.restassured.RestAssured;
+import api.rest.MoneyTransferTest;
 import io.restassured.path.json.JsonPath;
 import org.eclipse.jetty.http.HttpStatus;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static api.rest.TestConstants.*;
@@ -13,18 +10,7 @@ import static api.rest.TestHelper.*;
 import static io.restassured.RestAssured.get;
 import static org.junit.Assert.assertEquals;
 
-public class GetAccountByAccountIdPositiveTest {
-    @BeforeClass
-    public static void init() {
-        MoneyTransferRest.start();
-        RestAssured.baseURI = "http://localhost";
-        RestAssured.port = 8082;
-    }
-
-    @AfterClass
-    public static void stopServer() {
-        MoneyTransferRest.stop();
-    }
+public class GetAccountByAccountIdPositiveTest extends MoneyTransferTest {
 
     @Test
     public void MTRA_060101_getAccount_whenMethodIsCallsWithExistentAccountId_thenAccountReturns() {
@@ -33,7 +19,7 @@ public class GetAccountByAccountIdPositiveTest {
         String accountId = createEmptyAccount(PASSPORT_ID1);
 
         //test
-        JsonPath readResult = get("/accounts/"+accountId).then()
+        JsonPath readResult = get("/accounts/" + accountId).then()
                 .assertThat()
                 .statusCode(HttpStatus.OK_200).
                         extract().jsonPath();

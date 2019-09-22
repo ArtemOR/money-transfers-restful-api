@@ -1,33 +1,17 @@
 package api.rest.negative;
 
+import api.rest.MoneyTransferTest;
 import api.rest.TestPayloadBuilder;
-import api.rest.MoneyTransferRest;
-import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import org.eclipse.jetty.http.HttpStatus;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static api.rest.TestConstants.*;
 import static api.rest.TestHelper.*;
-import static io.restassured.RestAssured.get;
 import static io.restassured.RestAssured.given;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class UpdateTransferMoneyBetweenAccountNegativeTest {
-    @BeforeClass
-    public static void init() {
-        MoneyTransferRest.start();
-        RestAssured.baseURI = "http://localhost";
-        RestAssured.port = 8082;
-    }
-
-    @AfterClass
-    public static void stopServer() {
-        MoneyTransferRest.stop();
-    }
+public class UpdateTransferMoneyBetweenAccountNegativeTest extends MoneyTransferTest {
 
     @Test
     public void MTRA_110201_moneyTransfer_whenAccountDoesNotExist_ThenExceptionIsThrown() {

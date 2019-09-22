@@ -1,6 +1,5 @@
-package api.implementation.service;
+package api.implementation.converter;
 
-import api.implementation.idgenerator.IdGenerator;
 import api.implementation.model.Account;
 import api.implementation.model.AccountType;
 import api.implementation.model.User;
@@ -15,19 +14,16 @@ import java.util.Objects;
 
 public class MoneyTransferModelConverter {
 
-    static User convertUserRequest(UserRequest userRequest) {
+    public User convertUserRequest(final UserRequest userRequest) {
         User user = new User();
         user.setName(userRequest.getName());
         user.setPassportId(userRequest.getPassportId());
-        user.setId(getIdGenerator().generateUserId());
 
         return user;
     }
 
-    static Account convertAccountRequest(AccountRequest accountRequest) {
+    public Account convertAccountRequest(final AccountRequest accountRequest) {
         Account account = new Account();
-        long accountId = getIdGenerator().generateAccountId();
-        account.setId(accountId);
         account.setPassportId(accountRequest.getPassportId());
         account.setMoneyBalance(Objects.isNull(accountRequest.getMoneyBalance()) ? BigDecimal.ZERO : new BigDecimal(accountRequest.getMoneyBalance()));
         account.setCreditLimit(Objects.isNull(accountRequest.getCreditLimit()) ? BigDecimal.ZERO : new BigDecimal(accountRequest.getCreditLimit()));
@@ -36,28 +32,23 @@ public class MoneyTransferModelConverter {
         return account;
     }
 
-    static InsideAccountTransfer convertTransferRequest(TransferRequest transferRequest) {
+    public InsideAccountTransfer convertTransferRequest(final TransferRequest transferRequest) {
         InsideAccountTransfer insideAccountTransfer = new InsideAccountTransfer();
         insideAccountTransfer.setAccountToId(Long.valueOf(transferRequest.getAccountToId()));
         insideAccountTransfer.setAmount(new BigDecimal(transferRequest.getAmount()));
-        insideAccountTransfer.setId(getIdGenerator().generateChargingId());
         insideAccountTransfer.setTime(System.currentTimeMillis());
 
         return insideAccountTransfer;
     }
 
-    static BetweenAccountsTransfer convertBetweenAccountsTransferRequest(TransferRequest transferRequest) {
+    public BetweenAccountsTransfer convertBetweenAccountsTransferRequest(final TransferRequest transferRequest) {
         BetweenAccountsTransfer betweenAccountsTransfer = new BetweenAccountsTransfer();
         betweenAccountsTransfer.setAccountToId(Long.valueOf(transferRequest.getAccountToId()));
         betweenAccountsTransfer.setAccountFromId(Long.valueOf(transferRequest.getAccountFromId()));
         betweenAccountsTransfer.setAmount(new BigDecimal(transferRequest.getAmount()));
-        betweenAccountsTransfer.setId(getIdGenerator().generateTransferId());
         betweenAccountsTransfer.setTime(System.currentTimeMillis());
 
         return betweenAccountsTransfer;
     }
 
-    private static IdGenerator getIdGenerator() {
-        return IdGenerator.getInstance();
-    }
 }

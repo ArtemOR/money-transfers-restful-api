@@ -1,11 +1,8 @@
 package api.rest.positive;
 
-import api.rest.MoneyTransferRest;
-import io.restassured.RestAssured;
+import api.rest.MoneyTransferTest;
 import io.restassured.path.json.JsonPath;
 import org.eclipse.jetty.http.HttpStatus;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -15,18 +12,7 @@ import static api.rest.TestHelper.*;
 import static io.restassured.RestAssured.get;
 import static org.junit.Assert.assertTrue;
 
-public class GetTransfersAllPositiveTest {
-    @BeforeClass
-    public static void init() {
-        MoneyTransferRest.start();
-        RestAssured.baseURI = "http://localhost";
-        RestAssured.port = 8082;
-    }
-
-    @AfterClass
-    public static void stopServer() {
-        MoneyTransferRest.stop();
-    }
+public class GetTransfersAllPositiveTest extends MoneyTransferTest {
 
     @Test
     public void MTRA_070101_getAllTransfers_whenMethodIsCalls_thenTransfersReturn() {
