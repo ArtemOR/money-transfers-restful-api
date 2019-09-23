@@ -5,22 +5,16 @@ import api.implementation.converter.MoneyTransferModelConverter;
 import api.implementation.exception.ExceptionList;
 import api.implementation.exception.MoneyTransferException;
 import api.implementation.model.Account;
-import api.implementation.model.AccountTransfer;
-import api.implementation.model.AccountType;
 import api.implementation.model.User;
 import api.implementation.model.request.AccountRequest;
-import api.implementation.model.request.TransferRequest;
 import api.implementation.model.request.UserRequest;
-import api.implementation.model.transfer.BetweenAccountsTransfer;
-import api.implementation.model.transfer.InsideAccountTransfer;
+import api.implementation.service.MoneyTransferService;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -28,18 +22,17 @@ import spark.Request;
 import spark.Response;
 
 import java.lang.reflect.Type;
-import java.math.BigDecimal;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.ArrayList;
+import java.util.List;
 
+import static api.implementation.constants.StringConstants.PASSPORT_ID_PARAM;
 import static api.implementation.exception.ExceptionList.*;
-import static api.implementation.controller.MoneyTransferRequestValidator.*;
-import static api.implementation.constants.StringConstants.*;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@Ignore
+
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({MoneyTransferRequestValidator.class, MoneyTransferModelConverter.class})
 public class MoneyTransferRestControllerTest {
@@ -65,18 +58,11 @@ public class MoneyTransferRestControllerTest {
         UserRequest userRequest = new UserRequest("name", "passprtId");
         String requestBody = gson.toJson(userRequest);
         when(request.body()).thenReturn(requestBody);
-        //MoneyTransferRestController.users = new HashMap<>();
 
         String responseString = MoneyTransferRestController.createUser(request, response);
 
         verify(request).body();
         verify(response).status(200);
-        PowerMockito.verifyStatic(MoneyTransferRequestValidator.class);
-        //assertObjectNotNull(userRequest);
-    //    PowerMockito.verifyStatic(MoneyTransferRequestValidator.class);
-        //validateUser(userRequest);
-//        PowerMockito.verifyStatic(MoneyTransferModelConverter.class);
-//        convertUserRequest(userRequest);
         User actual = gson.fromJson(responseString, User.class);
         assertNotNull(actual);
         assertEquals(userRequest.getName(), actual.getName());
@@ -97,13 +83,7 @@ public class MoneyTransferRestControllerTest {
         }
 
         verify(request).body();
-        PowerMockito.verifyStatic(MoneyTransferRequestValidator.class);
-//        assertObjectNotNull(requestBody);
-//        PowerMockito.verifyStatic(MoneyTransferRequestValidator.class, Mockito.never());
-//        validateUser(any());
-//        PowerMockito.verifyStatic(MoneyTransferModelConverter.class, Mockito.never());
-//        convertUserRequest(any());
-}
+    }
 
     @Test
     public void createUser_whenNotSpecifiedPassportId_thenExceptionIsThrows() {
@@ -121,12 +101,6 @@ public class MoneyTransferRestControllerTest {
         }
 
         verify(request).body();
-//        PowerMockito.verifyStatic(MoneyTransferRequestValidator.class);
-//        assertObjectNotNull(userRequest);
-//        PowerMockito.verifyStatic(MoneyTransferRequestValidator.class);
-//        validateUser(userRequest);
-//        PowerMockito.verifyStatic(MoneyTransferModelConverter.class, Mockito.never());
-//        convertUserRequest(userRequest);
     }
 
     @Test
@@ -137,76 +111,11 @@ public class MoneyTransferRestControllerTest {
         String requestBody = gson.toJson(accountRequest);
         when(request.body()).thenReturn(requestBody);
 
-        String responseString = MoneyTransferRestController.createAccount(request, response);
+        assertThatThrownBy(() -> MoneyTransferRestController.createAccount(request, response))
+                .isInstanceOf(MoneyTransferException.class).hasMessageContaining(USER_NOT_FOUND.message);
 
-        verify(request).body();
-        verify(response).status(200);
-      //  PowerMockito.verifyStatic(MoneyTransferRequestValidator.class);
-//        MoneyTransferRequestValidator.assertObjectNotNull(accountRequest);
-//        PowerMockito.verifyStatic(MoneyTransferRequestValidator.class);
-//        validateAccount(accountRequest);
-////        PowerMockito.verifyStatic(MoneyTransferModelConverter.class);
-//        convertAccountRequest(accountRequest);
-        Account actual = gson.fromJson(responseString, Account.class);
-      //  assertObjectNotNull(actual);
-        assertEquals(accountRequest.getPassportId(), actual.getPassportId());
-        assertEquals(new BigDecimal(accountRequest.getMoneyBalance()), actual.getMoneyBalance());
-        assertEquals(AccountType.DEBIT, actual.getAccountType());
-        assertEquals(BigDecimal.ZERO, actual.getCreditLimit());
     }
 
-    @Test
-    public void createAccount_whenRequestContainsCreditLimit_thenCreditAccountInResponse() {
-        AccountRequest accountRequest = new AccountRequest();
-        accountRequest.setPassportId("passId");
-        accountRequest.setCreditLimit("1000");
-        String requestBody = gson.toJson(accountRequest);
-        when(request.body()).thenReturn(requestBody);
-
-
-        String responseString = MoneyTransferRestController.createAccount(request, response);
-
-        verify(request).body();
-        verify(response).status(200);
-//        PowerMockito.verifyStatic(MoneyTransferRequestValidator.class);
-//        MoneyTransferRequestValidator.assertObjectNotNull(accountRequest);
-//        PowerMockito.verifyStatic(MoneyTransferRequestValidator.class);
-//        validateAccount(accountRequest);
-//        PowerMockito.verifyStatic(MoneyTransferModelConverter.class);
-//        convertAccountRequest(accountRequest);
-//        Account actual = gson.fromJson(responseString, Account.class);
-//        assertObjectNotNull(actual);
-//        assertEquals(accountRequest.getPassportId(), actual.getPassportId());
-//        assertEquals(BigDecimal.ZERO, actual.getMoneyBalance());
-//        assertEquals(AccountType.CREDIT, actual.getAccountType());
-//        assertEquals(new BigDecimal(accountRequest.getCreditLimit()), actual.getCreditLimit());
-    }
-
-    @Test
-    public void createAccount_whenUsersMapDoesNotContainsKey_thenExceptionIsThrows() {
-        AccountRequest accountRequest = new AccountRequest();
-        accountRequest.setPassportId("passportId");
-        accountRequest.setCreditLimit("1000");
-        String requestBody = gson.toJson(accountRequest);
-        when(request.body()).thenReturn(requestBody);
-
-
-        try {
-            String responseString = MoneyTransferRestController.createAccount(request, response);
-            fail();
-        } catch (Exception e) {
-            assertEquals(e.getClass(), MoneyTransferException.class);
-            assertTrue(e.getMessage().contains(USER_NOT_FOUND.message));
-        }
-
-        verify(request).body();
-//        PowerMockito.verifyStatic(MoneyTransferRequestValidator.class);
-//        assertObjectNotNull(accountRequest);
-//        PowerMockito.verifyStatic(MoneyTransferRequestValidator.class);
-//        validateAccount(accountRequest);
-//        PowerMockito.verifyStatic(MoneyTransferModelConverter.class, Mockito.never());
-//        convertAccountRequest(accountRequest);
-    }
 
     @Test
     public void createAccount_whenCreditLimitParameterNegative_thenExceptionIsThrows() {
@@ -216,21 +125,8 @@ public class MoneyTransferRestControllerTest {
         String requestBody = gson.toJson(accountRequest);
         when(request.body()).thenReturn(requestBody);
 
-        try {
-            String responseString = MoneyTransferRestController.createAccount(request, response);
-            fail();
-        } catch (Exception e) {
-            assertEquals(e.getClass(), MoneyTransferException.class);
-            assertTrue(e.getMessage().contains(MONEY_PARAMETER_SHOULD_CONTAIN_POSITIVE_VALUE.message));
-        }
-
-        verify(request).body();
-//        PowerMockito.verifyStatic(MoneyTransferRequestValidator.class);
-//        assertObjectNotNull(accountRequest);
-//        PowerMockito.verifyStatic(MoneyTransferRequestValidator.class);
-//        validateAccount(accountRequest);
-//        PowerMockito.verifyStatic(MoneyTransferModelConverter.class, Mockito.never());
-//        convertAccountRequest(accountRequest);
+        assertThatThrownBy(() -> MoneyTransferRestController.createAccount(request, response))
+                .isInstanceOf(MoneyTransferException.class).hasMessageContaining(MONEY_PARAMETER_SHOULD_CONTAIN_POSITIVE_VALUE.message);
     }
 
     @Test
@@ -239,26 +135,11 @@ public class MoneyTransferRestControllerTest {
         accountRequest.setMoneyBalance("1000");
         String requestBody = gson.toJson(accountRequest);
         when(request.body()).thenReturn(requestBody);
-//        HashMap<String, User> userHashMap = new HashMap<>();
-//        userHashMap.put("passId", new User());
-//        MoneyTransferRestController.users = userHashMap;
-//        MoneyTransferRestController.accounts = new ConcurrentHashMap<>();
 
-        try {
-            String responseString = MoneyTransferRestController.createAccount(request, response);
-            fail();
-        } catch (Exception e) {
-            assertEquals(e.getClass(), MoneyTransferException.class);
-            assertTrue(e.getMessage().contains(MISSING_MANDATORY_PARAMETERS.message));
-        }
+        assertThatThrownBy(() -> MoneyTransferRestController.createAccount(request, response))
+                .isInstanceOf(MoneyTransferException.class).hasMessageContaining(MISSING_MANDATORY_PARAMETERS.message);
 
         verify(request).body();
-//        PowerMockito.verifyStatic(MoneyTransferRequestValidator.class);
-//        assertObjectNotNull(accountRequest);
-//        PowerMockito.verifyStatic(MoneyTransferRequestValidator.class);
-//        validateAccount(accountRequest);
-//        PowerMockito.verifyStatic(MoneyTransferModelConverter.class, Mockito.never());
-//        convertAccountRequest(accountRequest);
     }
 
     @Test
@@ -266,291 +147,31 @@ public class MoneyTransferRestControllerTest {
         String passportId = "nonExistent";
         when(request.params(PASSPORT_ID_PARAM)).thenReturn(passportId);
 
-        try {
-            String responseString = MoneyTransferRestController.getUserByPassportId(request, response);
-            fail();
-        } catch (Exception e) {
-            assertEquals(e.getClass(), MoneyTransferException.class);
-            assertTrue(e.getMessage().contains(USER_NOT_FOUND.message));
-        }
+        assertThatThrownBy(() -> MoneyTransferRestController.getUserByPassportId(request, response))
+                .isInstanceOf(MoneyTransferException.class).hasMessageContaining(USER_NOT_FOUND.message);
 
         verify(request).params(PASSPORT_ID_PARAM);
-//        PowerMockito.verifyStatic(MoneyTransferRequestValidator.class);
-//        assertUserExist(passportId);
-    }
-
-    @Test
-    public void getUserByPassportId_whenUserExist_thenUserInResponse() {
-        String passportId = "existent";
-        String name = "name1";
-        when(request.params(PASSPORT_ID_PARAM)).thenReturn(passportId);
-       // HashMap<String, User> userHashMap = new HashMap<>();
-        User expected = createUser(name, passportId);
-        //userHashMap.put(expected.getPassportId(), expected);
-        //MoneyTransferRestController.users = userHashMap;
-
-        String responseString = MoneyTransferRestController.getUserByPassportId(request, response);
-
-        User actual = gson.fromJson(responseString, User.class);
-        verify(request).params(PASSPORT_ID_PARAM);
-//        PowerMockito.verifyStatic(MoneyTransferRequestValidator.class);
-//        assertUserExist(passportId);
-        assertEquals(expected.getName(), actual.getName());
-        assertEquals(expected.getPassportId(), actual.getPassportId());
     }
 
     @Test
     public void getAllUsers_whenMethodCalls_thenUsersReturns() {
-        User user1 = createUser("name1", "passp1");
-        User user2 = createUser("name2", "passp2");
-        HashMap<String, User> userHashMap = new HashMap<>();
-        userHashMap.put(user1.getPassportId(), user1);
-        userHashMap.put(user2.getPassportId(), user2);
-      //  MoneyTransferRestController.users = userHashMap;
-
         String responseString = MoneyTransferRestController.getAllUsers(request, response);
 
         Type itemsListType = new TypeToken<List<User>>() {
         }.getType();
         ArrayList<User> actual = gson.fromJson(responseString, itemsListType);
         assertNotNull(actual);
-        assertEquals(2, actual.size());
     }
 
-    @Test
-    public void getAccountByAccountId_whenMethodCalls_thenAccountsReturns() {
-        Account expected = new Account(1L, "userid1", BigDecimal.ZERO, AccountType.CREDIT, BigDecimal.TEN);
-        Map<Long, Account> accountsMap = new ConcurrentHashMap<>();
-        accountsMap.put(expected.getId(), expected);
-      //  MoneyTransferRestController.accounts = accountsMap;
-        String accountId = String.valueOf(expected.getId());
-        when(request.params(ACCOUNT_ID_PARAM)).thenReturn(accountId);
-
-        String responseString = MoneyTransferRestController.getAccountByAccountId(request, response);
-
-        verify(request).params(ACCOUNT_ID_PARAM);
-//        PowerMockito.verifyStatic(MoneyTransferRequestValidator.class);
-//        assertAccountExist(Long.valueOf(accountId));
-        Account actual = gson.fromJson(responseString, Account.class);
-        assertEquals(expected, actual);
-    }
 
     @Test
     public void getAllAccounts_whenMethodCalls_thenAccountsReturns() {
-
-
         String responseString = MoneyTransferRestController.getAllAccounts(request, response);
 
         Type itemsListType = new TypeToken<List<Account>>() {
         }.getType();
         ArrayList<Account> actual = gson.fromJson(responseString, itemsListType);
         assertNotNull(actual);
-
-    }
-
-    @Test
-    public void getAllTransfersHistory_whenMethodCalls_thenTransfersReturns() {
-        BetweenAccountsTransfer accountTransfer1 = new BetweenAccountsTransfer(1L, 11L, 111L, BigDecimal.TEN, System.currentTimeMillis());
-        BetweenAccountsTransfer accountTransfer2 = new BetweenAccountsTransfer(2L, 11L, 111L, BigDecimal.ONE, System.currentTimeMillis());
-        Map<Long, AccountTransfer> transfersMap = new HashMap<>();
-        transfersMap.put(accountTransfer1.getId(), accountTransfer1);
-        transfersMap.put(accountTransfer2.getId(), accountTransfer2);
-      //  MoneyTransferRestController.transfers = transfersMap;
-
-        String responseString = MoneyTransferRestController.getAllTransfersHistory(request, response);
-
-        Type itemsListType = new TypeToken<List<BetweenAccountsTransfer>>() {
-        }.getType();
-        ArrayList<Account> actual = gson.fromJson(responseString, itemsListType);
-        assertNotNull(actual);
-        assertEquals(2, actual.size());
-    }
-
-    @Test
-    public void getTransfersHistoryBySenderId_whenTransferInMap_thenTransferReturns() {
-        BetweenAccountsTransfer expected = new BetweenAccountsTransfer(1L, 11L, 111L, BigDecimal.TEN, System.currentTimeMillis());
-        BetweenAccountsTransfer accountTransfer2 = new BetweenAccountsTransfer(2L, 12L, 112L, BigDecimal.ONE, System.currentTimeMillis());
-        Map<Long, AccountTransfer> transfersMap = new HashMap<>();
-        transfersMap.put(expected.getId(), expected);
-        transfersMap.put(accountTransfer2.getId(), accountTransfer2);
-      //  MoneyTransferRestController.transfers = transfersMap;
-        String accountFromId = String.valueOf(expected.getAccountFromId());
-        when(request.params(ACCOUNT_FROM_ID_PARAM)).thenReturn(accountFromId);
-        Map<Long, Account> accountsMap = new ConcurrentHashMap<>();
-        Account account = new Account(expected.getAccountFromId(), "userid1", BigDecimal.TEN, AccountType.DEBIT, BigDecimal.ZERO);
-        accountsMap.put(account.getId(), account);
-     //   MoneyTransferRestController.accounts = accountsMap;
-
-        String responseString = MoneyTransferRestController.getTransfersHistoryBySenderId(request, response);
-
-        verify(request).params(ACCOUNT_FROM_ID_PARAM);
-        Type itemsListType = new TypeToken<List<BetweenAccountsTransfer>>() {
-        }.getType();
-        ArrayList<BetweenAccountsTransfer> actual = gson.fromJson(responseString, itemsListType);
-        assertNotNull(actual);
-        assertEquals(actual, Collections.singletonList(expected));
-    }
-
-    @Test
-    public void getTransfersHistoryByReceiverId_whenTransferInMap_thenTransferReturns() {
-        BetweenAccountsTransfer expected = new BetweenAccountsTransfer(1L, 11L, 111L, BigDecimal.TEN, System.currentTimeMillis());
-        BetweenAccountsTransfer accountTransfer2 = new BetweenAccountsTransfer(2L, 12L, 112L, BigDecimal.ONE, System.currentTimeMillis());
-      //  Map<Long, AccountTransfer> transfersMap = new HashMap<>();
-     //   transfersMap.put(expected.getId(), expected);
-     //   transfersMap.put(accountTransfer2.getId(), accountTransfer2);
-     //   MoneyTransferRestController.transfers = transfersMap;
-        String accountToId = String.valueOf(expected.getAccountToId());
-        when(request.params(ACCOUNT_TO_ID_PARAM)).thenReturn(accountToId);
-      //  Map<Long, Account> accountsMap = new ConcurrentHashMap<>();
-        Account account = new Account(expected.getAccountToId(), "userid1", BigDecimal.TEN, AccountType.DEBIT, BigDecimal.ZERO);
-     //   accountsMap.put(account.getId(), account);
-     //   MoneyTransferRestController.accounts = accountsMap;
-
-        String responseString = MoneyTransferRestController.getTransfersHistoryByReceiverId(request, response);
-
-        verify(request).params(ACCOUNT_TO_ID_PARAM);
-        Type itemsListType = new TypeToken<List<BetweenAccountsTransfer>>() {
-        }.getType();
-        ArrayList<BetweenAccountsTransfer> actual = gson.fromJson(responseString, itemsListType);
-        assertNotNull(actual);
-        assertEquals(actual, Collections.singletonList(expected));
-    }
-
-    @Test
-    public void transferMoneyBetweenAccounts_whenTransferInMap_thenTransferReturns() {
-        String accountId = "112";
-        String amount = "100";
-        String initialAmount = "10";
-        TransferRequest transferRequest = new TransferRequest();
-        transferRequest.setAccountToId(accountId);
-        transferRequest.setAmount(amount);
-        when(request.body()).thenReturn(gson.toJson(transferRequest, TransferRequest.class));
-        Map<Long, Account> accountsMap = new ConcurrentHashMap<>();
-        Account account = new Account(Long.valueOf(accountId), "userid1", new BigDecimal(initialAmount), AccountType.DEBIT, BigDecimal.ZERO);
-        accountsMap.put(account.getId(), account);
-       // MoneyTransferRestController.accounts = accountsMap;
-
-        String responseString = MoneyTransferRestController.addMoneyToAccount(request, response);
-
-        verify(request).body();
-        InsideAccountTransfer actual = gson.fromJson(responseString, InsideAccountTransfer.class);
-        PowerMockito.verifyStatic(MoneyTransferModelConverter.class);
-      //  convertTransferRequest(transferRequest);
-        assertNotNull(actual);
-        assertEquals(new BigDecimal(amount), actual.getAmount());
-    }
-
-    @Test
-    public void transferMoneyBetweenAccounts_whenMethodCalls_thenTransferReturns() {
-        String accountToId = "11";
-        String accountFromId = "22";
-        String amount = "5";
-        Account account1 = new Account(Long.valueOf(accountFromId), "userid1", BigDecimal.ZERO, AccountType.CREDIT, BigDecimal.TEN);
-        Account account2 = new Account(Long.valueOf(accountToId), "userid1", BigDecimal.ZERO, AccountType.DEBIT, BigDecimal.ZERO);
-        Map<Long, Account> accountsMap = new ConcurrentHashMap<>();
-        accountsMap.put(account1.getId(), account1);
-        accountsMap.put(account2.getId(), account2);
-     //   MoneyTransferRestController.accounts = accountsMap;
-        TransferRequest transferRequest = new TransferRequest();
-        transferRequest.setAccountFromId(accountFromId);
-        transferRequest.setAccountToId(accountToId);
-        transferRequest.setAmount(amount);
-        when(request.body()).thenReturn(gson.toJson(transferRequest, TransferRequest.class));
-
-        String responseString = MoneyTransferRestController.transferMoneyBetweenAccounts(request, response);
-
-        verify(request).body();
-        BetweenAccountsTransfer actual = gson.fromJson(responseString, BetweenAccountsTransfer.class);
-       // PowerMockito.verifyStatic(MoneyTransferModelConverter.class);
-      //  convertBetweenAccountsTransferRequest(transferRequest);
-//        PowerMockito.verifyStatic(MoneyTransferRequestValidator.class);
-//        validateTransferBetweenAccounts(transferRequest);
-        assertNotNull(actual);
-        assertEquals(new BigDecimal(amount), actual.getAmount());
-    }
-
-    @Test
-    public void transferMoneyBetweenAccounts_whenNotEnoughMonet_thenExceptionIsThrows() {
-        String accountToId = "11";
-        String accountFromId = "22";
-        String amount = "5000";
-        Account account1 = new Account(Long.valueOf(accountFromId), "userid1", BigDecimal.ZERO, AccountType.CREDIT, BigDecimal.TEN);
-        Account account2 = new Account(Long.valueOf(accountToId), "userid1", BigDecimal.ZERO, AccountType.DEBIT, BigDecimal.ZERO);
-    //    Map<Long, Account> accountsMap = new ConcurrentHashMap<>();
-    //    accountsMap.put(account1.getId(), account1);
-   //     accountsMap.put(account2.getId(), account2);
-   //     MoneyTransferRestController.accounts = accountsMap;
-        TransferRequest transferRequest = new TransferRequest();
-        transferRequest.setAccountFromId(accountFromId);
-        transferRequest.setAccountToId(accountToId);
-        transferRequest.setAmount(amount);
-        when(request.body()).thenReturn(gson.toJson(transferRequest, TransferRequest.class));
-
-        try {
-            String responseString = MoneyTransferRestController.transferMoneyBetweenAccounts(request, response);
-            fail();
-        } catch (Exception e) {
-            assertEquals(e.getClass(), MoneyTransferException.class);
-            assertTrue(e.getMessage().contains(NOT_ENOUGH_MONEY.message));
-        }
-
-        verify(request).body();
-//        PowerMockito.verifyStatic(MoneyTransferRequestValidator.class);
-//        validateTransferBetweenAccounts(transferRequest);
-    //    PowerMockito.verifyStatic(MoneyTransferModelConverter.class, Mockito.never());
-  //      convertBetweenAccountsTransferRequest(transferRequest);
-    }
-
-    @Test
-    public void deleteUserByPassportId_whenUserExist_thenMethodIsExecutes() {
-        String passportId = "passpId";
-        String name = "name1";
-        when(request.params(PASSPORT_ID_PARAM)).thenReturn(passportId);
-        HashMap<String, User> userHashMap = new HashMap<>();
-
-        User forDelete = createUser(name, passportId);
-        userHashMap.put(forDelete.getPassportId(), forDelete);
-   //     MoneyTransferRestController.users = userHashMap;
-
-        MoneyTransferRestController.deleteUserByPassportId(request, response);
-
-        verify(request).params(PASSPORT_ID_PARAM);
-//        PowerMockito.verifyStatic(MoneyTransferRequestValidator.class);
-//        assertUserExist(passportId);
-        assertTrue(!userHashMap.containsKey(passportId));
-    }
-
-    @Test
-    public void deleteAccountByAccountId_whenMethodCalls_thenMethodIsExecutes() {
-        Account forDelete = new Account(1L, "userid1", BigDecimal.ZERO, AccountType.CREDIT, BigDecimal.TEN);
-        Map<Long, Account> accountsMap = new ConcurrentHashMap<>();
-        accountsMap.put(forDelete.getId(), forDelete);
-   //     MoneyTransferRestController.accounts = accountsMap;
-        String accountId = String.valueOf(forDelete.getId());
-        when(request.params(ACCOUNT_ID_PARAM)).thenReturn(accountId);
-
-        MoneyTransferRestController.deleteAccountByAccountId(request, response);
-
-        verify(request).params(ACCOUNT_ID_PARAM);
-//        PowerMockito.verifyStatic(MoneyTransferRequestValidator.class);
-//        assertAccountExist(Long.valueOf(accountId));
-        assertTrue(!accountsMap.containsKey(forDelete.getId()));
-    }
-
-    @Test
-    public void deleteTransferByTransferId_whenMethodCalls_thenMethodIsExecutes() {
-        BetweenAccountsTransfer forDelete = new BetweenAccountsTransfer(1L, 11L, 111L, BigDecimal.TEN, System.currentTimeMillis());
-
-
-
-        String transferId = String.valueOf(forDelete.getId());
-        when(request.params(TRANSFER_ID_ID_PARAM)).thenReturn(transferId);
-
-        MoneyTransferRestController.deleteTransferByTransferId(request, response);
-
-        verify(request).params(TRANSFER_ID_ID_PARAM);
-//        PowerMockito.verifyStatic(MoneyTransferRequestValidator.class);
-//        assertTransferExist(Long.valueOf(transferId));
 
     }
 

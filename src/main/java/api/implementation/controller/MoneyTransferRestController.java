@@ -200,13 +200,13 @@ public class MoneyTransferRestController {
         User mike = new User(2L, "Mike", "222");
         moneyTransferService.createUser(mike);
 
-        Account johnsFirstAccount = new Account(11L, "111", new BigDecimal(1000), AccountType.DEBIT, new BigDecimal(0));
+        Account johnsFirstAccount = new Account("111", new BigDecimal(1000), AccountType.DEBIT, new BigDecimal(0));
         moneyTransferService.createAccount(johnsFirstAccount);
 
-        Account johnsSecondAccount = new Account(12L, "111", new BigDecimal(0), AccountType.CREDIT, new BigDecimal(1000));
+        Account johnsSecondAccount = new Account("111", new BigDecimal(0), AccountType.CREDIT, new BigDecimal(1000));
         moneyTransferService.createAccount(johnsSecondAccount);
 
-        Account mikesAccount = new Account(13L, "222", new BigDecimal(3000), AccountType.DEBIT, new BigDecimal(0));
+        Account mikesAccount = new Account("222", new BigDecimal(3000), AccountType.DEBIT, new BigDecimal(0));
         moneyTransferService.createAccount(mikesAccount);
 
         response.status(HttpStatus.NO_CONTENT_204);

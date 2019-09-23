@@ -16,7 +16,7 @@ public class MoneyTransferRequestValidator {
 
     public void assertObjectNotNull(Object object) {
         if (Objects.isNull(object)) {
-            throw new MoneyTransferException(ExceptionList.MISSING_REQUEST, REQUEST);
+            throw new MoneyTransferException(ExceptionList.MISSING_REQUEST);
         }
     }
 
