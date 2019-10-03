@@ -9,10 +9,9 @@ public class BetweenAccountsTransfer extends AccountTransfer {
     private long id;
     private Long accountFromId;
 
-    public BetweenAccountsTransfer(Long transferId, Long accountFromId, Long accountToId, BigDecimal amount, Long time) {
+    public BetweenAccountsTransfer(Long accountFromId, Long accountToId, BigDecimal amount, Long time) {
         super(accountToId, amount, time);
         this.accountFromId = accountFromId;
-        this.id = transferId;
     }
 
     public BetweenAccountsTransfer() {

@@ -18,6 +18,7 @@ dependencies {
     testCompile "org.powermock:powermock-module-junit4:1.7.3"
     testCompile "org.powermock:powermock-api-mockito2:1.7.3"
     testCompile 'io.rest-assured:rest-assured:4.0.0'
+    testCompile 'org.assertj:assertj-core:3.11.1'
     compile 'com.sparkjava:spark-core:2.9.1'
     compile 'com.google.code.gson:gson:2.8.5'
     compile 'org.slf4j:slf4j-nop:1.7.28'

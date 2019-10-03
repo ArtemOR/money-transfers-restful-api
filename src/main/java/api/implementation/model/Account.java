@@ -57,9 +57,8 @@ public class Account {
     public Account() {
     }
 
-    public Account(long id, String passportId, BigDecimal moneyBalance, AccountType accountType,
+    public Account(String passportId, BigDecimal moneyBalance, AccountType accountType,
                    BigDecimal creditLimit) {
-        this.id = id;
         this.passportId = passportId;
         this.moneyBalance = moneyBalance;
         this.accountType = accountType;

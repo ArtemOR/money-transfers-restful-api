@@ -1,8 +1,7 @@
-package api.implementation.service;
+package api.implementation.constants;
 
 public class StringConstants {
 
-    public static final String REQUEST = "request";
     public static final String PASSPORT_ID_PARAM = "passportId";
     public static final String NAME_PARAM = "name";
     public static final String MONEY_BALANCE_PARAM = "moneyBalance";

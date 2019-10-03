@@ -1,12 +1,9 @@
 package api.rest.negative;
 
+import api.rest.MoneyTransferTest;
 import api.rest.TestPayloadBuilder;
-import api.rest.MoneyTransferRest;
-import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import org.eclipse.jetty.http.HttpStatus;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static api.rest.TestConstants.*;
@@ -15,20 +12,7 @@ import static api.rest.TestHelper.createUser;
 import static io.restassured.RestAssured.given;
 import static org.junit.Assert.assertTrue;
 
-public class CreateUserNegativeTest {
-
-    @BeforeClass
-    public static void init() {
-        MoneyTransferRest.start();
-        RestAssured.baseURI = "http://localhost";
-        RestAssured.port = 8082;
-    }
-
-    @AfterClass
-    public static void stopServer() {
-        MoneyTransferRest.stop();
-    }
-
+public class CreateUserNegativeTest extends MoneyTransferTest {
     @Test
     public void MTRA_010201_createUser_whenUserCreatesWithoutMandatoryParam_thenExceptionThrows() {
         //prepare data

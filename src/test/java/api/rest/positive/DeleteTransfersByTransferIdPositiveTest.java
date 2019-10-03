@@ -1,35 +1,15 @@
 package api.rest.positive;
 
-import api.rest.MoneyTransferRest;
-import io.restassured.RestAssured;
-import io.restassured.path.json.JsonPath;
+import api.rest.MoneyTransferTest;
 import org.eclipse.jetty.http.HttpStatus;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 import static api.rest.TestConstants.*;
 import static api.rest.TestHelper.*;
 import static io.restassured.RestAssured.delete;
 import static io.restassured.RestAssured.get;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
-public class DeleteTransfersByTransferIdPositiveTest {
-    @BeforeClass
-    public static void init() {
-        MoneyTransferRest.start();
-        RestAssured.baseURI = "http://localhost";
-        RestAssured.port = 8082;
-    }
-
-    @AfterClass
-    public static void stopServer() {
-        MoneyTransferRest.stop();
-    }
+public class DeleteTransfersByTransferIdPositiveTest extends MoneyTransferTest {
 
     @Test
     public void MTRA_140101_deleteTransfersByTransferId_whenTransferIdExist_thenOperationExecute() {
@@ -41,13 +21,13 @@ public class DeleteTransfersByTransferIdPositiveTest {
         String transferId = transferMoneyBetweenAccounts(accountFromId, accountToId, SMALL_MONEY_VALUE);
 
         //test
-         delete("/accounts/transfers/"+transferId).then()
+        delete("/accounts/transfers/" + transferId).then()
                 .assertThat()
                 .statusCode(HttpStatus.NO_CONTENT_204).
-                        extract().jsonPath();
+                extract().jsonPath();
 
         //verify
-        get("/accounts/transfers/"+transferId).then()
+        get("/accounts/transfers/" + transferId).then()
                 .assertThat()
                 .statusCode(HttpStatus.NOT_FOUND_404).
                 extract().jsonPath();

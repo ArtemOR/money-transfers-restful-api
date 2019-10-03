@@ -24,7 +24,7 @@ Application uses port 8082
 
 - root directory contains PostMan Collection with call samples "transfer.postman_collection"
 - root directory contains test plan for integration tests
-- in memory already created some test objects of users and accounts
+- to crease some test data(users and accounts) call "/testData" URL by POST method with empty body
 
 Methods description:
 

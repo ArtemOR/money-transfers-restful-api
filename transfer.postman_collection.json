@@ -351,6 +351,28 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "localhost:8082/testData",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "\n {\n\t\"passportId\": \"111\",\n    \"moneyBalance\": 1000,\n    \"creditLimit\": 10000\n   \n}"
+				},
+				"url": {
+					"raw": "localhost:8082/accounts",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"accounts"
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }
