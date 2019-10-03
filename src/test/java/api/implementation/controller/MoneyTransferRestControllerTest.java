@@ -8,7 +8,6 @@ import api.implementation.model.Account;
 import api.implementation.model.User;
 import api.implementation.model.request.AccountRequest;
 import api.implementation.model.request.UserRequest;
-import api.implementation.service.MoneyTransferService;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.junit.Before;

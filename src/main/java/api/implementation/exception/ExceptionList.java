@@ -14,7 +14,8 @@ public enum ExceptionList {
     TRANSFERS_NOT_FOUND("id8", "Transfers not found for account: accountId=", HttpStatus.NOT_FOUND_404),
     WRONG_NUMBER_FORMAT("id9", "Bad Request. Cannot cast string to number value", HttpStatus.BAD_REQUEST_400),
     CHOSE_DIFFERENT_ACCOUNT_IDS("id10", "accountFromId and accountToId parameters are equal. Please specify different.", HttpStatus.BAD_REQUEST_400),
-    MISSING_REQUEST("id11", "Request body is empty", HttpStatus.BAD_REQUEST_400);
+    MISSING_REQUEST("id11", "Request body is empty", HttpStatus.BAD_REQUEST_400),
+    OBJECT_IS_NULL("id12", "Object is null", HttpStatus.BAD_REQUEST_400);
 
     public String exceptionId;
     public String message;

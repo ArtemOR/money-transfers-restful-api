@@ -27,11 +27,13 @@ public class MoneyTransferService implements IMoneyTransferService {
     //store all transactions of transfers
     private final Map<Long, AccountTransfer> transfers = new ConcurrentHashMap<>();
 
-    Lock lock = new ReentrantLock();
+    private Lock lock = new ReentrantLock();
 
     @Override
     public User createUser(final User user) {
-        //check is this object already exist
+        assertNotNull(user);
+
+        //check if this object already exist
         String passportId = user.getPassportId();
         user.setId(getIdGenerator().generateUserId());
         User created = users.putIfAbsent(passportId, user);
@@ -43,6 +45,8 @@ public class MoneyTransferService implements IMoneyTransferService {
 
     @Override
     public Account createAccount(final Account account) {
+        assertNotNull(account);
+
         lock.lock();
         try {
             //check if user exist
@@ -124,6 +128,8 @@ public class MoneyTransferService implements IMoneyTransferService {
 
     @Override
     public void addMoneyToAccount(final InsideAccountTransfer transfer) {
+        assertNotNull(transfer);
+
         Long accountId = transfer.getAccountToId();
 
         lock.lock();
@@ -147,12 +153,14 @@ public class MoneyTransferService implements IMoneyTransferService {
 
     @Override
     public void transferMoneyBetweenAccounts(final BetweenAccountsTransfer transfer) {
+        assertNotNull(transfer);
 
         //updates balances for both accounts
         final BigDecimal value = transfer.getAmount();
         final Long accountFromId = transfer.getAccountFromId();
         final Long accountToId = transfer.getAccountToId();
 
+        //for the practice of avoiding the deadlock
         if (accountFromId < accountToId) {
             Account accountFrom = accounts.get(accountFromId);
             if (Objects.isNull(accountFrom)) {
@@ -240,6 +248,12 @@ public class MoneyTransferService implements IMoneyTransferService {
         //check if account exist
         if (!accounts.containsKey(accountId)) {
             throw new MoneyTransferException(ExceptionList.ACCOUNT_NOT_FOUND, accountId.toString());
+        }
+    }
+
+    private void assertNotNull(final Object obj) {
+        if(Objects.isNull(obj)){
+            throw new MoneyTransferException(ExceptionList.OBJECT_IS_NULL);
         }
     }
 

@@ -23,7 +23,6 @@ public class MoneyTransferModelConverterTest {
         UserRequest userRequest = new UserRequest();
         userRequest.setName("name");
         userRequest.setPassportId("passportId");
-
         User expected = new User();
         expected.setName(userRequest.getName());
         expected.setPassportId(userRequest.getPassportId());
@@ -38,7 +37,6 @@ public class MoneyTransferModelConverterTest {
         AccountRequest accountRequest = new AccountRequest();
         accountRequest.setPassportId("passportId");
         accountRequest.setMoneyBalance("1000");
-
         Account expected = new Account();
         expected.setPassportId(accountRequest.getPassportId());
         expected.setMoneyBalance(new BigDecimal(accountRequest.getMoneyBalance()));
@@ -55,7 +53,6 @@ public class MoneyTransferModelConverterTest {
         AccountRequest accountRequest = new AccountRequest();
         accountRequest.setPassportId("passportId");
         accountRequest.setCreditLimit("1000");
-
         Account expected = new Account();
         expected.setPassportId(accountRequest.getPassportId());
         expected.setMoneyBalance(BigDecimal.ZERO);
@@ -72,7 +69,6 @@ public class MoneyTransferModelConverterTest {
         TransferRequest transferRequest = new TransferRequest();
         transferRequest.setAccountToId("123");
         transferRequest.setAmount("1000");
-
         InsideAccountTransfer expected = new InsideAccountTransfer();
         expected.setAccountToId(Long.valueOf(transferRequest.getAccountToId()));
         expected.setAmount(new BigDecimal(transferRequest.getAmount()));
@@ -97,7 +93,6 @@ public class MoneyTransferModelConverterTest {
         expected.setAccountFromId(Long.valueOf(transferRequest.getAccountFromId()));
         expected.setAmount(new BigDecimal(transferRequest.getAmount()));
         expected.setTime(System.currentTimeMillis());
-
 
         BetweenAccountsTransfer actual = underTest.convertBetweenAccountsTransferRequest(transferRequest);
 
